@@ -15,5 +15,8 @@
     "url": "https://github.com/elijahducote/StooperFunctions/issues"
   },
   "homepage": "https://github.com/elijahducote/StooperFunctions#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "hono": "^4.7.7"
+  }
 }

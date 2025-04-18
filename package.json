@@ -18,6 +18,10 @@
   "homepage": "https://github.com/elijahducote/StooperFunctions#readme",
   "description": "",
   "dependencies": {
-    "hono": "^4.7.7"
+    "axios": "^1.8.4",
+    "busboy": "^1.6.0",
+    "dayjs": "^1.11.13",
+    "hono": "^4.7.7",
+    "stripe": "^18.0.0"
   }
 }

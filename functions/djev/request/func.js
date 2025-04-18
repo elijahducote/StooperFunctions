@@ -1,5 +1,5 @@
 import axios from "axios";
-import {sendHTMLResponse} from "../../lib/ntry.js";
+import {sendHTMLResponse} from "../../../lib/ntry.js";
 
 export async function request (body) {
   try {

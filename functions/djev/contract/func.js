@@ -28,7 +28,7 @@ export async function contract (body) {
       headers: {
         "X-Entity-Ref-ID": Math.floor(Date.now() / 1000).toString()
       },
-      subject: `New Payment: \$${fields.amount?.[0] || "No Amount"}`,
+      subject: `New Payment: ${fields.amount?.[0] || "No Amount"}`,
       html: buildEmailHtml(fields)
     };
     /*if (files[files.length - 1].content.length) emailPayload.attachments = files.map(file => ({
@@ -38,14 +38,14 @@ export async function contract (body) {
     }));*/
 
     // Send to Resend API
-    await axios.post('https://api.resend.com/emails', emailPayload, {
+    /* await axios.post('https://api.resend.com/emails', emailPayload, {
       headers: {
         "Authorization": `Bearer ${Deno.env.get("RESEND_API_KEY")}`
       }
     }).catch((err) => {
       error = err;
     });
-
+ */
     
     if (error !== false) throw new Error(error);
 

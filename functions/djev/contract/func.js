@@ -1,11 +1,11 @@
 import axios from "axios";
-import {sendHTMLResponse} from "../../../lib/ntry.js";
+import {sendHTMLResponse,print} from "../../../lib/ntry.js";
 
 export async function contract (body) {
   try {
-    //const { fields, files } = body;
-    
-    //if (!fields && !files) throw new Error("Does not exist!");
+    const { fields, files } = body;
+    console.log(fields);
+    if (!fields && !files) throw new Error("Does not exist!");
 
     let statum = false,
     error = false;
@@ -22,7 +22,7 @@ export async function contract (body) {
     if (!statum) throw new Error(error);*/
 
     // Prepare email payload
-    /* const emailPayload = {
+    const emailPayload = {
       from: 'DJ Ev <booking@djev.org>',
       to: ["evanducote@gmail.com","evbeats.net@gmail.com","ducote.help@gmail.com"],
       headers: {
@@ -30,37 +30,35 @@ export async function contract (body) {
       },
       subject: `New Payment: ${fields.amount?.[0] || "No Amount"}`,
       html: buildEmailHtml(fields)
-    }; */
-    /*if (files[files.length - 1].content.length) emailPayload.attachments = files.map(file => ({
+    };
+    if (files[files.length - 1].content.length) emailPayload.attachments = files.map(file => ({
         content: file.content.toString("base64"),
         filename: file.filename,
         contentType: file.contentType
-    }));*/
+    }));
 
     // Send to Resend API
-    /* await axios.post('https://api.resend.com/emails', emailPayload, {
+    await axios.post("https://api.resend.com/emails", emailPayload, {
       headers: {
         "Authorization": `Bearer ${Deno.env.get("RESEND_API_KEY")}`
       }
     }).catch((err) => {
       error = err;
     });
- */
     
-    if (error !== false) throw new Error(error);
+    if (error) throw new Error(error);
 
     return {
-      msg: "",
+      msg: sendHTMLResponse(1),
       code: 200,
       type: "text/html"
     };
     
   } catch (error) {
     return {
-      msg: JSON.stringify(error),
-      //msg: sendHTMLResponse(0, error.message),
+      msg: sendHTMLResponse(0, error.message),
       code: 500,
-      type: "text/plain"
+      type: "text/html"
     };
   }
 }

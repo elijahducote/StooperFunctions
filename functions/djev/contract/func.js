@@ -5,6 +5,8 @@ export async function contract (body) {
   try {
     const { fields, files } = body;
     
+    if (!fields && !files) throw new Error("Does not exist!");
+
     let statum = false,
     error = false;
     

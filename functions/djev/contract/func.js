@@ -3,9 +3,9 @@ import {sendHTMLResponse} from "../../../lib/ntry.js";
 
 export async function contract (body) {
   try {
-    const { fields, files } = body;
+    //const { fields, files } = body;
     
-    if (!fields && !files) throw new Error("Does not exist!");
+    //if (!fields && !files) throw new Error("Does not exist!");
 
     let statum = false,
     error = false;
@@ -50,7 +50,7 @@ export async function contract (body) {
     if (error !== false) throw new Error(error);
 
     return {
-      msg: JSON.stringify(fields),
+      msg: "",
       code: 200,
       type: "text/html"
     };

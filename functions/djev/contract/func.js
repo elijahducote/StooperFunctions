@@ -49,9 +49,10 @@ export async function contract (body) {
     
   } catch (error) {
     return {
-      msg: sendHTMLResponse(0, error.message),
+      msg: error,
+      //msg: sendHTMLResponse(0, error.message),
       code: 500,
-      type: "text/html"
+      type: "text/plain"
     };
   }
 }

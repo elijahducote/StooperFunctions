@@ -57,7 +57,7 @@ export async function contract (body) {
     
   } catch (error) {
     return {
-      msg: error,
+      msg: JSON.stringify(error),
       //msg: sendHTMLResponse(0, error.message),
       code: 500,
       type: "text/plain"

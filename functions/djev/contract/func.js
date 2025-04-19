@@ -31,11 +31,11 @@ export async function contract (body) {
       subject: `New Payment: \$${fields.amount?.[0] || "No Amount"}`,
       html: buildEmailHtml(fields)
     };
-    if (files[files.length - 1].content.length) emailPayload.attachments = files.map(file => ({
+    /*if (files[files.length - 1].content.length) emailPayload.attachments = files.map(file => ({
         content: file.content.toString("base64"),
         filename: file.filename,
         contentType: file.contentType
-    }));
+    }));*/
 
     // Send to Resend API
     await axios.post('https://api.resend.com/emails', emailPayload, {

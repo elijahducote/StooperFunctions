@@ -6,6 +6,7 @@ import {message} from "./message/func.js";
 import {request} from "./request/func.js"; 
 import {resend} from "./resend/func.js";
 import {subscribe} from "./subscribe/func.js";
+import {contract} from "./contract/func.js";
 
 
 export {
@@ -16,5 +17,6 @@ export {
   message,
   request,
   resend,
-  subscribe
+  subscribe,
+  contract
 };

@@ -1,7 +1,7 @@
 import axios from "axios";
 import {sendHTMLResponse} from "../../../lib/ntry.js";
 
-export async function resend (body) {
+export async function contract (body) {
   try {
     const { fields, files } = body;
     

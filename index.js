@@ -8,7 +8,8 @@ import {
   message,
   request,
   resend,
-  subscribe
+  subscribe,
+  contract
 } from "./functions/djev/ntry.js";
 const app = new Hono();
 
@@ -20,5 +21,6 @@ app.post("/message", wrapper(message,"HONO"));
 app.post("/request", wrapper(request,"HONO"));
 app.post("/resend", wrapper(resend,"HONO"));
 app.post("/subscribe", wrapper(subscribe,"HONO"));
+app.post("/contract", wrapper(contract,"HONO"));
 
 Deno.serve(app.fetch);

@@ -50,7 +50,7 @@ export async function contract (body) {
     if (error !== false) throw new Error(error);
 
     return {
-      msg: sendHTMLResponse(1),
+      msg: "sendHTMLResponse(1)",
       code: 200,
       type: "text/html"
     };

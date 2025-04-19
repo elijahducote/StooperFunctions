@@ -8,7 +8,7 @@ export async function contract (body) {
     let statum = false,
     error = false;
     
-    const params = new URLSearchParams();
+    /*const params = new URLSearchParams();
     params.append("secret", Deno.env.get("HCAPTCHA_SECRET"));
     params.append("response", fields.token);
 
@@ -17,7 +17,8 @@ export async function contract (body) {
     }).catch((err) => {
       error = err;
     });
-    if (!statum) throw new Error(error);
+    if (!statum) throw new Error(error);*/
+
     // Prepare email payload
     const emailPayload = {
       from: 'DJ Ev <booking@djev.org>',
@@ -39,12 +40,9 @@ export async function contract (body) {
       headers: {
         "Authorization": `Bearer ${Deno.env.get("RESEND_API_KEY")}`
       }
-    }).catch((err) => {
-      error = err;
     });
 
-    if (error) throw new Error(error);
-
+    
     return {
       msg: sendHTMLResponse(1),
       code: 200,

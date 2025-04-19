@@ -22,7 +22,7 @@ export async function contract (body) {
     if (!statum) throw new Error(error);*/
 
     // Prepare email payload
-    const emailPayload = {
+    /* const emailPayload = {
       from: 'DJ Ev <booking@djev.org>',
       to: ["evanducote@gmail.com","evbeats.net@gmail.com","ducote.help@gmail.com"],
       headers: {
@@ -30,7 +30,7 @@ export async function contract (body) {
       },
       subject: `New Payment: ${fields.amount?.[0] || "No Amount"}`,
       html: buildEmailHtml(fields)
-    };
+    }; */
     /*if (files[files.length - 1].content.length) emailPayload.attachments = files.map(file => ({
         content: file.content.toString("base64"),
         filename: file.filename,
@@ -50,7 +50,7 @@ export async function contract (body) {
     if (error !== false) throw new Error(error);
 
     return {
-      msg: "sendHTMLResponse(1)",
+      msg: JSON.stringify(fields),
       code: 200,
       type: "text/html"
     };

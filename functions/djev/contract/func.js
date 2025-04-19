@@ -39,7 +39,11 @@ export async function contract (body) {
       headers: {
         "Authorization": `Bearer ${Deno.env.get("RESEND_API_KEY")}`
       }
+    }).catch((err) => {
+      error = err;
     });
+
+    if (error) throw new Error(error);
 
     return {
       msg: sendHTMLResponse(1),

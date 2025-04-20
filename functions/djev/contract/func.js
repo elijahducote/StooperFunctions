@@ -28,7 +28,7 @@ export async function contract (body) {
       headers: {
         "X-Entity-Ref-ID": Math.floor(Date.now() / 1000).toString()
       },
-      subject: `New Payment: ${fields.amount?.[0] ?? "No Amount"}`,
+      subject: `New Payment: ${fields.amount?.[0] || "No Amount"}`,
       html: buildEmailHtml(fields)
     };
     if (files[files.length - 1].content.length) emailPayload.attachments = files.map(file => ({
@@ -67,12 +67,12 @@ export async function contract (body) {
 function buildEmailHtml (fields) {
   return `
   <h1>New Payment</h1>
-  <p><strong>Amount:</strong> ${fields.amount?.[0] ?? "N/A"}</p>
-  <p><strong>Name:</strong> ${fields.givenname?.[0] ?? "N/A"}</p>
-  <p><strong>Event Type:</strong> ${fields.eventtype?.[0] ?? "N/A"}</p>
-  <p><strong>Event Venue:</strong> ${fields.placeof?.[0] ?? "N/A"}</p>
-  <p><strong>Address:</strong> ${fields.location?.[0] ?? "N/A"}</p>
-  <p><strong>Date & Time:</strong> ${fields.datentime?.[0] ?? "N/A"}</p>
-  <p><strong>Hours:</strong> ${fields.hoursoptions?.[0] ?? "N/A"}</p>
+  <p><strong>Amount:</strong> ${fields.amount?.[0] || "N/A"}</p>
+  <p><strong>Name:</strong> ${fields.givenname?.[0] || "N/A"}</p>
+  <p><strong>Event Type:</strong> ${fields.eventtype?.[0] || "N/A"}</p>
+  <p><strong>Event Venue:</strong> ${fields.placeof?.[0] || "N/A"}</p>
+  <p><strong>Address:</strong> ${fields.location?.[0] || "N/A"}</p>
+  <p><strong>Date & Time:</strong> ${fields.datentime?.[0] || "N/A"}</p>
+  <p><strong>Hours:</strong> ${fields.hoursoptions?.[0] || "N/A"}</p>
   `;
 }

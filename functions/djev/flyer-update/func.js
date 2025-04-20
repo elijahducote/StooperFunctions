@@ -180,7 +180,8 @@ async function updateFlyers (captions) {
 }
 
 export async function flyerUpdate() {
-  let resp;
+  let resp,
+  error;
   try {
     const server_time = dayjs().utc().tz("America/Lima"),
     options = {
@@ -193,7 +194,7 @@ export async function flyerUpdate() {
       responseEncoding: "utf8"
     },
     {data: {result: {edges: items}}} = await axios.post("https://save-insta1.p.rapidapi.com/profileposts",{username:"_djev_"},options).catch((err)=>{
-      console.log(err);
+      error = err;
     }),
     nth = items.length,
     candidates = [],
@@ -227,7 +228,7 @@ export async function flyerUpdate() {
   }
   catch (err) {
     return {
-      msg: err,
+      msg: JSON.stringify(err) + JSON.stringify(error),
       code: 400,
       type: "text/plain"
     }

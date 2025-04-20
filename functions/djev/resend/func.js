@@ -60,13 +60,14 @@ export async function resend (body) {
 function buildEmailHtml (fields) {
   return `
   <h1>New Form Submission</h1>
-  <p><strong>Date:</strong> ${fields.date?.[0] || "N/A"}</p>
-  <p><strong>Location:</strong> ${fields.locale?.[0] || "N/A"}</p>
-  <p><strong>Email:</strong> ${fields.email?.[0] || "N/A"}</p>
-  <p><strong>Event:</strong> ${fields.event?.[0] || "N/A"}</p>
-  <p><strong>Selection:</strong> ${fields.selection?.join(", ") || "None"}</p>
-  <p><strong>Requests:</strong> ${fields.requests?.[0] || "N/A"}</p>
-  <p><strong>Dislikes:</strong> ${fields.dislikes?.[0] || "N/A"}</p>
-  <p><strong>Comments:</strong> ${fields.comments?.[0] || "N/A"}</p>
+  <p><strong>Date:</strong> ${fields.date?.[0] ?? "N/A"}</p>
+  <p><strong>Location:</strong> ${fields.locale?.[0] ?? "N/A"}</p>
+  <p><strong>Hours:</strong> ${fields.workhrs?.[0] ?? "N/A"}</p>
+  <p><strong>Email:</strong> ${fields.email?.[0] ?? "N/A"}</p>
+  <p><strong>Event:</strong> ${fields.event?.[0] ?? "N/A"}</p>
+  <p><strong>Selection:</strong> ${fields.selection?.join(", ") ?? "None"}</p>
+  <p><strong>Requests:</strong> ${fields.requests?.[0] ?? "N/A"}</p>
+  <p><strong>Dislikes:</strong> ${fields.dislikes?.[0] ?? "N/A"}</p>
+  <p><strong>Comments:</strong> ${fields.comments?.[0] ?? "N/A"}</p>
   `;
 }

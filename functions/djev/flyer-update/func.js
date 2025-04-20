@@ -186,7 +186,7 @@ export async function flyerUpdate() {
     options = {
       headers: {
         "x-rapidapi-host": "save-insta1.p.rapidapi.com",
-        "x-rapidapi-key": "def3d41743msh26e2dad9df3f033p10eeb4jsn25e2449eaeef",
+        "x-rapidapi-key": Deno.env.get("RAPID_API_KEY"),
         "Content-Type": "application/json"
       },
       responseType: "json",

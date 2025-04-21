@@ -200,8 +200,9 @@ export async function flyerUpdate() {
       console.error("API request failed:", err.message);
       throw new Error(`API request failed: ${err.message}`);
     });
+    
+    response.data = JSON.parse(response.data);
 
-    response = JSON.parse(response);
     // Validate the response structure
     if (!response.data?.result?.edges) {
       console.error("Unexpected API response structure:", JSON.stringify(response.data));

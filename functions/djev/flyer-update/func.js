@@ -1,4 +1,5 @@
 import axios from "npm:axios";
+import { Buffer } from "node:buffer";
 
 import {checkValues,tabulateList,report,sendHTMLResponse} from "../../../lib/utility.js";
 import { jsonrepair } from "npm:jsonrepair";

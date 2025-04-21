@@ -192,10 +192,24 @@ export async function flyerUpdate() {
       responseType: "json",
       responseEncoding: "utf8"
     },
-    {data: {result: {edges: items}}} = await axios.post("https://save-insta1.p.rapidapi.com/profileposts",{username:"_djev_"},options).catch((err)=>{
-      console.log(err);
-    }),
-    nth = items.length,
+    response = await axios.post(
+      "https://save-insta1.p.rapidapi.com/profileposts",
+      {username:"_djev_"},
+      options
+    ).catch((err) => {
+      console.error("API request failed:", err.message);
+      throw new Error(`API request failed: ${err.message}`);
+    });
+
+    // Validate the response structure
+    if (!response.data?.result?.edges) {
+      console.error("Unexpected API response structure:", JSON.stringify(response.data));
+      throw new Error("API response missing expected data structure");
+    }
+
+    const {data: {result: {edges: items}}} = response;
+
+    const nth = items.length,
     candidates = [],
     captions = [],
     posts = [];

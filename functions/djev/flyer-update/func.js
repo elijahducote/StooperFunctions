@@ -1,11 +1,11 @@
-import axios from "axios";
+import axios from "npm:axios";
 
 import {checkValues,tabulateList,report,sendHTMLResponse} from "../../../lib/utility.js";
 
 // DayJS
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc.js";
-import timezone from "dayjs/plugin/timezone.js";
+import dayjs from "npm:dayjs";
+import utc from "npm:dayjs/plugin/utc.js";
+import timezone from "npm:dayjs/plugin/timezone.js";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("America/Lima");
@@ -180,21 +180,20 @@ async function updateFlyers (captions) {
 }
 
 export async function flyerUpdate() {
-  let resp,
-  error;
+  let resp;
   try {
     const server_time = dayjs().utc().tz("America/Lima"),
     options = {
       headers: {
         "x-rapidapi-host": "save-insta1.p.rapidapi.com",
-        "x-rapidapi-key": Deno.env.get("RAPID_API_KEY"),
+        "x-rapidapi-key": "40e82884e3msh4daf8915a723745p1675c7jsn0d210687a2bb",
         "Content-Type": "application/json"
       },
       responseType: "json",
       responseEncoding: "utf8"
     },
     {data: {result: {edges: items}}} = await axios.post("https://save-insta1.p.rapidapi.com/profileposts",{username:"_djev_"},options).catch((err)=>{
-      error = err;
+      console.log(err);
     }),
     nth = items.length,
     candidates = [],

@@ -1,7 +1,7 @@
 import axios from "npm:axios";
 
 import {checkValues,tabulateList,report,sendHTMLResponse} from "../../../lib/utility.js";
-
+import { jsonrepair } from "npm:jsonrepair";
 // DayJS
 import dayjs from "npm:dayjs";
 import utc from "npm:dayjs/plugin/utc.js";
@@ -200,7 +200,7 @@ export async function flyerUpdate() {
       throw new Error(`API request failed: ${err.message}`);
     });
     
-    response.data = JSON.parse(response.data);
+    response.data = JSON.parse(jsonrepair(response.data));
 
     // Validate the response structure
     if (!response.data?.result?.edges) {

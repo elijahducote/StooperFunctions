@@ -182,8 +182,12 @@ async function updateFlyers (captions) {
 export async function flyerUpdate() {
   let resp;
   try {
-    const server_time = dayjs().utc().tz("America/Lima"),
-    options = {
+    // Start with getting the server time
+    const server_time = dayjs().utc().tz("America/Lima");
+    console.log(`Server time: ${server_time.format()}`);
+    
+    // Set up API options
+    const options = {
       headers: {
         "x-rapidapi-host": "save-insta1.p.rapidapi.com",
         "x-rapidapi-key": "40e82884e3msh4daf8915a723745p1675c7jsn0d210687a2bb",
@@ -191,59 +195,144 @@ export async function flyerUpdate() {
       },
       responseType: "json",
       responseEncoding: "utf8"
-    },
-    response = await axios.post(
+    };
+    
+    // Make the API request with proper error handling
+    console.log("Making request to Instagram API...");
+    const response = await axios.post(
       "https://save-insta1.p.rapidapi.com/profileposts",
       {username:"_djev_"},
       options
     ).catch((err) => {
       console.error("API request failed:", err.message);
-      throw new Error(`API request failed: ${err.message}`);
+      if (err.response) {
+        console.error("Response status:", err.response.status);
+        console.error("Response data:", JSON.stringify(err.response.data));
+      }
+      throw new Error(`Instagram API request failed: ${err.message}`);
     });
-
+    
     // Validate the response structure
-    if (!response.data?.result?.edges) {
-      console.error("Unexpected API response structure:", JSON.stringify(response.data));
-      throw new Error("API response missing expected data structure");
+    console.log("API request successful, validating response structure...");
+    if (!response.data) {
+      console.error("API response missing data field");
+      throw new Error("API response missing data field");
     }
+    if (!response.data.result) {
+      console.error("API response missing result field:", JSON.stringify(response.data));
+      throw new Error("API response missing result field");
+    }
+    if (!response.data.result.edges) {
+      console.error("API response missing edges field:", JSON.stringify(response.data.result));
+      throw new Error("API response missing edges field");
+    }
+    
+    // Now safely extract the items
+    const items = response.data.result.edges;
+    const nth = items.length;
+    console.log(`Found ${nth} items from API response`);
+    
+    // Proceed with processing
+    const candidates = [];
+    const captions = [];
+    const posts = [];
 
-    const {data: {result: {edges: items}}} = response;
+    let itR8 = nth;
+    let curN;
+    let tymStamp;
 
-    const nth = items.length,
-    candidates = [],
-    captions = [],
-    posts = [];
-
-    let itR8 = nth,
-    curN,
-    tymStamp;
-
+    console.log("Processing posts...");
     for (;itR8;--itR8) {
       curN = nth - itR8;
+      
+      // Validate item structure before accessing properties
+      if (!items[curN] || !items[curN].node) {
+        console.warn(`Skipping item ${curN}: Invalid structure`);
+        continue;
+      }
+      
+      // Check timestamp exists
+      if (!items[curN].node.taken_at) {
+        console.warn(`Skipping item ${curN}: Missing timestamp`);
+        continue;
+      }
+      
       tymStamp = dayjs.unix(items[curN].node.taken_at).utc().tz("America/Lima");
-      if (server_time.diff(tymStamp,"month") < 3 && items[curN].node.image_versions2.candidates[0].url && items[curN].node.caption.text.length) {
+      console.log(`Post ${curN} timestamp: ${tymStamp.format()}, age in months: ${server_time.diff(tymStamp, "month")}`);
+      
+      // Check all required fields exist
+      const hasImage = items[curN].node.image_versions2 && 
+                       items[curN].node.image_versions2.candidates && 
+                       items[curN].node.image_versions2.candidates.length > 0 &&
+                       items[curN].node.image_versions2.candidates[0].url;
+                       
+      const hasCaption = items[curN].node.caption && 
+                         items[curN].node.caption.text !== undefined;
+      
+      if (server_time.diff(tymStamp, "month") < 3 && hasImage && hasCaption) {
+        console.log(`Adding post ${curN} to processing queue`);
         captions[captions.length] = encodeURI(items[curN].node.caption.text);
         candidates[candidates.length] = items[curN].node.image_versions2.candidates[0].url;
-        posts[posts.length] = {uri:`ntra/src/media/flyers/${curN}.jpg`,img:await getImageAsBase64(items[curN].node.image_versions2.candidates[0].url)};
+        
+        // Get image as base64 with proper error handling
+        try {
+          console.log(`Fetching image for post ${curN}...`);
+          const imageBase64 = await getImageAsBase64(items[curN].node.image_versions2.candidates[0].url);
+          posts[posts.length] = {uri:`ntra/src/media/flyers/${curN}.jpg`, img: imageBase64};
+          console.log(`Successfully processed image for post ${curN}`);
+        } catch (imgErr) {
+          console.error(`Failed to fetch image for post ${curN}:`, imgErr.message);
+          // Continue with other posts rather than failing completely
+          continue;
+        }
+      } else {
+        console.log(`Skipping post ${curN}: too old or missing image/caption`);
       }
     }
     
-    await updateMultipleFiles(posts);
+    // Only proceed if we have posts to update
+    if (posts.length === 0) {
+      console.log("No valid posts found to update");
+      return {
+        msg: "No posts to update",
+        code: 200,
+        type: "text/plain"
+      };
+    }
+    
+    // Update files with proper error handling
+    console.log(`Updating ${posts.length} files to GitHub...`);
+    try {
+      await updateMultipleFiles(posts);
+      console.log("Files successfully updated to GitHub");
+    } catch (updateErr) {
+      console.error("Failed to update files to GitHub:", updateErr.message);
+      throw new Error(`GitHub file update failed: ${updateErr.message}`);
+    }
 
-    console.log(captions);
-    resp = await updateFlyers(captions);
+    // Update flyers with proper error handling
+    console.log(`Updating flyer captions...`);
+    console.log("Captions:", captions);
+    try {
+      resp = await updateFlyers(captions);
+      console.log("Flyers successfully updated");
+    } catch (flyerErr) {
+      console.error("Failed to update flyers:", flyerErr.message);
+      throw new Error(`Flyer update failed: ${flyerErr.message}`);
+    }
 
     return {
       msg: resp,
       code: 200,
       type: "text/html"
-    }
+    };
   }
   catch (err) {
+    console.error("flyerUpdate function failed:", err.message);
     return {
-      msg: err,
+      msg: `Error: ${err.message}`,
       code: 400,
       type: "text/plain"
-    }
+    };
   }
 }

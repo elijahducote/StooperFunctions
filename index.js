@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Hono } from "npm:hono";
 import { wrapper } from "./lib/wrapr.js";
 import {
   createIntent,

@@ -13,6 +13,10 @@ import {
 } from "./functions/djev/ntry.js";
 const app = new Hono();
 
+Deno.cron("Run every 24 hours", "*/1440 * * * *", {
+  backoffSchedule: [500, 500, 500, 500, 500]
+}, flyerUpdate);
+
 app.post("/create-intent", wrapper(createIntent,"HONO"));
 app.post("/deliver", wrapper(deliver,"HONO"));
 app.get("/flyer-update", wrapper(flyerUpdate,"HONO"));

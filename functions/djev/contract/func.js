@@ -4,22 +4,23 @@ import {sendHTMLResponse,print} from "../../../lib/ntry.js";
 export async function contract (body) {
   try {
     const { fields, files } = body;
-    console.log(fields);
+
     if (!fields && !files) throw new Error("Does not exist!");
 
     let statum = false,
     error = false;
     
+    /*
     const params = new URLSearchParams();
     params.append("secret", Deno.env.get("HCAPTCHA_SECRET"));
-    params.append("response", fields.token);
+    params.append("response", fields.htoken);
 
     await axios.post("https://api.hcaptcha.com/siteverify", params).then((resp) => {
       statum = resp.data.success;
     }).catch((err) => {
       error = err;
     });
-    if (!statum) throw new Error(error);
+    if (!statum) throw new Error(error);*/
 
     // Prepare email payload
     const emailPayload = {
@@ -56,7 +57,8 @@ export async function contract (body) {
     
   } catch (error) {
     return {
-      msg: sendHTMLResponse(0, error.message),
+      //msg: sendHTMLResponse(0, error.message),
+      msg: error,
       code: 500,
       type: "text/html"
     };

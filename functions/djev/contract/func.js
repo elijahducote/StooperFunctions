@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "npm:axios";
 import {sendHTMLResponse,print} from "../../../lib/ntry.js";
 
 export async function contract (body) {
@@ -41,7 +41,7 @@ export async function contract (body) {
     // Send to Resend API
     const resp = await axios.post("https://api.resend.com/emails", emailPayload, {
       headers: {
-        "Authorization": `Bearer ${Deno.env.get("RESEND_API_KEY}")}`
+        "Authorization": `Bearer ${Deno.env.get("RESEND_API_KEY")}`
       }
     }).catch((err) => {
       error = err;

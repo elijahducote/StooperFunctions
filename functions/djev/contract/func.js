@@ -39,7 +39,7 @@ export async function contract (body) {
     }));
 
     // Send to Resend API
-    await axios.post("https://api.resend.com/emails", emailPayload, {
+    const resp = await axios.post("https://api.resend.com/emails", emailPayload, {
       headers: {
         "Authorization": `Bearer ${Deno.env.get("RESEND_API_KEY}")}`
       }
@@ -47,7 +47,7 @@ export async function contract (body) {
       error = err;
     });
     
-    if (error) throw new Error(error);
+    if (error) throw new Error(JSON.stringify(resp.data));
 
     return {
       msg: sendHTMLResponse(1),

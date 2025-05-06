@@ -10,7 +10,7 @@ export async function resend (body) {
     
     const params = new URLSearchParams();
     params.append("secret", Deno.env.get("HCAPTCHA_SECRET"));
-    params.append("response", fields.token);
+    params.append("response", fields.token?.[0]);
 
     await axios.post("https://api.hcaptcha.com/siteverify", params).then((resp) => {
       statum = resp.data.success;

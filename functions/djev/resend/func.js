@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "npm:axios";
 import {sendHTMLResponse} from "../../../lib/ntry.js";
 
 export async function resend (body) {

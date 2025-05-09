@@ -6,7 +6,8 @@ export async function resend (body) {
     const { fields, files } = body;
     
     let statum = false,
-    error = "Unable to verify!";
+    error = "Unable to verify!",
+    feedback;
     
     /*const params = new URLSearchParams();
     params.append("secret", Deno.env.get("HCAPTCHA_SECRET"));
@@ -34,16 +35,21 @@ export async function resend (body) {
         contentType: file.contentType
     }));
 
+    console.log(emailPayload);
     // Send to Resend API
     await axios.post('https://api.resend.com/emails', emailPayload, {
       headers: {
         "Authorization": `Bearer ${Deno.env.get("RESEND_API_KEY")}`
         "Content-Type": "application/json"
       }
+    }).then((resp) => {
+      feedback = resp.data;
+    }).catch((resp) => {
+      feedback = resp.data;
     });
 
     return {
-      msg: sendHTMLResponse(1),
+      msg: sendHTMLResponse(1,feedback),
       code: 200,
       type: "text/html"
     };

@@ -42,14 +42,10 @@ export async function resend (body) {
         "Authorization": `Bearer ${Deno.env.get("RESEND_API_KEY")}`,
         "Content-Type": "application/json"
       }
-    }).then((resp) => {
-      feedback = resp.data;
-    }).catch((resp) => {
-      feedback = resp.data;
     });
 
     return {
-      msg: sendHTMLResponse(1,feedback),
+      msg: sendHTMLResponse(1),
       code: 200,
       type: "text/html"
     };

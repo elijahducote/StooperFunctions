@@ -6,9 +6,9 @@ export async function resend (body) {
     const { fields, files } = body;
     
     let statum = false,
-    error = false;
+    error = "Unable to verify!";
     
-    const params = new URLSearchParams();
+    /*const params = new URLSearchParams();
     params.append("secret", Deno.env.get("HCAPTCHA_SECRET"));
     params.append("response", fields.token?.[0]);
 
@@ -17,7 +17,7 @@ export async function resend (body) {
     }).catch((err) => {
       error = err;
     });
-    if (!statum) throw new Error(error);
+    if (!statum) throw new Error(error);*/
     // Prepare email payload
     const emailPayload = {
       from: 'DJ Ev <booking@djev.org>',

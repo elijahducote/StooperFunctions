@@ -11,12 +11,16 @@ import {
   subscribe,
   contract
 } from "./functions/djev/ntry.js";
+import {
+  sendMail
+} from "./functions/ald/ntry.js";
 const app = new Hono();
 
 Deno.cron("Run every 24 hours", "0 0 * * *", {
   backoffSchedule: [500, 500, 500, 500, 500]
 }, flyerUpdate);
 
+app.post("/send-mail", wrapper(sendMail,"HONO")).get(wrapper(sendMail,"HONO"));
 app.post("/create-intent", wrapper(createIntent,"HONO"));
 app.post("/deliver", wrapper(deliver,"HONO"));
 app.get("/flyer-update", wrapper(flyerUpdate,"HONO"));

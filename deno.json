@@ -1,0 +1,11 @@
+{
+  "imports": {
+    "hono/": "npm:hono/",
+    "@hono/node-server/": "npm:@hono/node-server/",
+    "axios/": "npm:axios/",
+    "busboy/": "npm:busboy/",
+    "dayjs/": "npm:dayjs/",
+    "jsonrepair/": "npm:jsonrepair/",
+    "stripe/": "npm:stripe/"
+  }
+} 

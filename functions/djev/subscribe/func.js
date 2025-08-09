@@ -1,5 +1,5 @@
-import axios from "npm:axios";
-import {sendHTMLResponse,report,checkValues,tabulateList} from "../../../lib/utility.js";
+import axios from "axios";
+import {envLookup,sendHTMLResponse,report,checkValues,tabulateList} from "../../../lib/utility.js";
 
 export async function subscribe (body) {
   
@@ -17,7 +17,7 @@ export async function subscribe (body) {
     mailerlite = axios.create({
       baseURL: "https://connect.mailerlite.com/api",
       headers: {
-        "Authorization": `Bearer ${Deno.env.get("MAILERLITE_TOKEN")}`,
+        "Authorization": `Bearer ${envLookup("MAILERLITE_TOKEN")}`,
         "Content-Type": "application/json",
         "Accept": "application/json",
         "X-Version": "2038-01-19"
@@ -42,7 +42,7 @@ export async function subscribe (body) {
       else report("Something went wrong.",log,false);
     }
     
-    if (checkValues(log,[1,3,5,7,9])) return {
+    if (checkValues(log)) return {
       code: 200,
       type: "text/html",
       msg: sendHTMLResponse(1,undefined,{svg:svg[1],msg:tabulateList(log),color:"#00AAFF"})

@@ -16,7 +16,7 @@ import {
 } from "./functions/ald/ntry.js";
 const app = new Hono();
 
-Deno.cron("Run every 24 hours", "0 0 * * *", {
+Deno.cron("Run every week", "0 0 * * 0", {
   backoffSchedule: [500, 500, 500, 500, 500]
 }, flyerUpdate);
 

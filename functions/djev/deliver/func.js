@@ -1,5 +1,7 @@
 import axios from "axios";
 
+import {envLookup} from "../../../lib/ntry.js"";
+
 export async function deliver (body) {
     const queryStringParameters = new URLSearchParams(body),
     nametag = ["Try again","Success"],
@@ -40,12 +42,12 @@ export async function deliver (body) {
         resend = axios.create({
             baseURL: "https://api.resend.com",
             headers: {
-                "Authorization": `Bearer ${Deno.env.get("RESEND_API_KEY")}`,
+                "Authorization": `Bearer ${envLookup("RESEND_API_KEY")}`,
                 "Content-Type": "application/json"
             }
         });
         
-        queryStringParameters.append("secret",Deno.env.get("HCAPTCHA_SECRET"));
+        queryStringParameters.append("secret", envLookup("HCAPTCHA_SECRET"));
         
         await hcaptcha.post("/siteverify", queryStringParameters).then((resp) => {
             statum = resp.data.success;

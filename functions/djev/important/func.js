@@ -1,5 +1,5 @@
 import axios from "axios";
-import {checkValues,tabulateList,report,sendHTMLResponse} from "../../../lib/utility.js";
+import {envLookup,checkValues,tabulateList,report,sendHTMLResponse} from "../../../lib/utility.js";
 
 export async function important () {
   let log = [];
@@ -7,7 +7,7 @@ export async function important () {
     const gh = axios.create({
       baseURL: "https://api.github.com/repos/elijahducote/trifectshow",
       headers: {
-        "Authorization": `Bearer ${Deno.env.get("GIT")}`,
+        "Authorization": `Bearer ${envLookup("GIT")}`,
         "Accept": "application/vnd.github.object+json,text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.5",
         "X-GitHub-Api-Version": "2022-11-28",
@@ -32,7 +32,7 @@ export async function important () {
       if (fileStatus === 200) report(`Got the important.json file: "${fileResponse.sha}"`,log);
       else report(`Something not right: "${fileResponse}"`,log,false);
       
-      if (checkValues(log,[1,3])) {
+      if (checkValues(log) {
         const {sha: latestCommit} = vow[0].value.data,
         {content: fileContent, sha: blobHash} = vow[1].value.data,
         jsonObject = JSON.parse(atob(fileContent));
@@ -56,7 +56,7 @@ export async function important () {
           report(`Couldn't update requested file: "${err}"`,log,false);
         });
       }
-      if (checkValues(log,[1,3,5,7],false)) throw new Error("Condition(s) not satified!");
+      if (checkValues(log,false)) throw new Error("Condition(s) not satified!");
     })
     .catch(err => {
       report(`${err}`,log,false);
@@ -67,7 +67,7 @@ export async function important () {
     report(`Critical error: ${err}`,log,false);
   }
   finally {
-    if (checkValues([1,3,5,7,9],log)) return {
+    if (checkValues(log)) return {
       msg: sendHTMLResponse(1,tabulateList(log)),
       type: "text/html",
       code: 200

@@ -1,6 +1,7 @@
-import {checkValues,tabulateList,report,sendHTMLResponse} from "../../../lib/utility.js";
+import {envLookup,checkValues,tabulateList,report,sendHTMLResponse} from "../../../lib/utility.js";
 import Stripe from "stripe";
-const stripe = Stripe(Deno.env.get("STRIPE_SK"),{apiVersion:"2025-02-24.acacia"});
+
+const stripe = Stripe(envLookup("STRIPE_SK"));
 
 export async function message(body) {
   try {

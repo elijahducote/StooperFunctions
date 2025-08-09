@@ -1,9 +1,11 @@
 import axios from "axios";
 
+import {envLookup} from "../../../lib/ntry.js"";
+
 const axiosInstance = axios.create({
   baseURL:"https://api.github.com/repos/elijahducote/DJEv",
   headers: {
-    "Authorization": `Bearer ${Deno.env.get("GITHUB_TOKEN")}`,
+    "Authorization": `Bearer ${envLookup("GITHUB_TOKEN")}`,
     "Accept": "application/vnd.github+json",
     "X-GitHub-Api-Version": "2022-11-28"
   }
@@ -102,7 +104,7 @@ async function updateMultipleFiles(files) {
   }
 }
 
-exports.handler = async function updater(event, context) {
+export async function updater() {
   try {
     const {data: ig} = await axios.request({
       method: "GET",
@@ -111,7 +113,7 @@ exports.handler = async function updater(event, context) {
         username_or_id_or_url: "_djev_"
       },
       headers: {
-        "x-rapidapi-key": Deno.env.get("RAPIDAPI_KEY"),
+        "x-rapidapi-key": envLookup("RAPIDAPI_KEY"),
         "x-rapidapi-host": "instagram-scraper-api2.p.rapidapi.com"
       }
     }),
@@ -146,7 +148,7 @@ exports.handler = async function updater(event, context) {
   }
   catch (err) {
     return {
-      statusCode:400,
+      c:400,
       headers: {
         "Content-Type": "text/html"
       },

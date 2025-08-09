@@ -1,6 +1,6 @@
 import axios from "axios";
-import {sendHTMLResponse} from "../../../lib/ntry.js";
-
+import {envLookup,sendHTMLResponse} from "../../../lib/ntry.js";
+ 
 export async function request (body) {
   try {
     const { fields, files } = body;
@@ -9,7 +9,7 @@ export async function request (body) {
     error = false;
     
     const params = new URLSearchParams();
-    params.append("secret", Deno.env.get("HCAPTCHA_SECRET"));
+    params.append("secret", envLookup("HCAPTCHA_SECRET"));
     params.append("response", fields.token);
 
     await axios.post("https://api.hcaptcha.com/siteverify", params).then((resp) => {
@@ -32,7 +32,7 @@ export async function request (body) {
     // Send to Resend API
     await axios.post('https://api.resend.com/emails', emailPayload, {
       headers: {
-        "Authorization": `Bearer ${Deno.env.get("RESEND_API_KEY")}`
+        "Authorization": `Bearer ${Deno?.env?.get("RESEND_API_KEY") || process?.env?.RESEND_API_KEY}`
       }
     });
 

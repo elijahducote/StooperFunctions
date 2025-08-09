@@ -1,16 +1,15 @@
-import axios from "npm:axios";
+import axios from "axios";
 import { Buffer } from "node:buffer";
 
-import {checkValues,tabulateList,report,sendHTMLResponse} from "../../../lib/utility.js";
-import { jsonrepair } from "npm:jsonrepair";
+import {envLookup,checkValues,tabulateList,report,sendHTMLResponse} from "../../../lib/utility.js";
+import { jsonrepair } from "jsonrepair";
 // DayJS
-import dayjs from "npm:dayjs";
-import utc from "npm:dayjs/plugin/utc.js";
-import timezone from "npm:dayjs/plugin/timezone.js";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc.js";
+import timezone from "dayjs/plugin/timezone.js";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("America/Lima");
-
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -36,7 +35,7 @@ async function updateMultipleFiles(files) {
     const gh = axios.create({
       baseURL:"https://api.github.com/repos/elijahducote/DJ",
       headers: {
-        "Authorization": `Bearer ${Deno.env.get("GITHUB_TOKEN")}`,
+        "Authorization": `Bearer ${envLookup("GITHUB_TOKEN")}`,
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28"
       }
@@ -117,7 +116,7 @@ async function updateFlyers (captions) {
     const gh = axios.create({
       baseURL:"https://api.github.com/repos/elijahducote/DJ",
       headers: {
-        "Authorization": `Bearer ${Deno.env.get("GITHUB_TOKEN")}`,
+        "Authorization": `Bearer ${envLookup("GITHUB_TOKEN")}`,
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28"
       }
@@ -136,7 +135,7 @@ async function updateFlyers (captions) {
       if (fileStatus === 200) report(`Got the important.json file: "${fileResponse.sha}"`,log);
       else report(`Something not right: "${fileResponse}"`,log,false);
       
-      if (checkValues(log,[1,3])) {
+      if (checkValues(log)) {
         const {sha: latestCommit} = vow[0].value.data,
         {content: fileContent, sha: blobHash} = vow[1].value.data,
         jsonObject = JSON.parse(atob(fileContent));
@@ -164,7 +163,7 @@ async function updateFlyers (captions) {
           report(`Couldn't update requested file: "${err}"`,log,false);
         });
       }
-      if (checkValues(log,[1,3,5,7],false)) throw new Error("Condition(s) not satified!");
+      if (checkValues(log,false)) throw new Error("Condition(s) not satified!");
     })
     .catch(err => {
       report(`${err}`,log,false);
@@ -175,7 +174,7 @@ async function updateFlyers (captions) {
     report(`Critical error: ${err}`,log,false);
   }
   finally {
-    if (checkValues([1,3,5,7],log)) return sendHTMLResponse(1,tabulateList(log));
+    if (checkValues(log)) return sendHTMLResponse(1,tabulateList(log));
     else return sendHTMLResponse(0,tabulateList(log));
   }
 }
@@ -186,30 +185,34 @@ export async function flyerUpdate() {
     const server_time = dayjs().utc().tz("America/Lima"),
     options = {
       headers: {
-        "x-rapidapi-host": "save-insta1.p.rapidapi.com",
-        "x-rapidapi-key": "40e82884e3msh4daf8915a723745p1675c7jsn0d210687a2bb",
+        "x-rapidapi-host": "instagram-scraper-api12.p.rapidapi.com",
+        
+        // 9d5c26be38msh6d01dc42e5e9bffp1fcb31jsn8279a6c0b958
+        // 40e82884e3msh4daf8915a723745p1675c7jsn0d210687a2bb
+        "x-rapidapi-key": envLookup("RAPIDAPI_KEY"),
         "Content-Type": "application/json"
       },
       responseEncoding: "utf8"
     },
-    response = await axios.post(
-      "https://save-insta1.p.rapidapi.com/profileposts",
-      {username:"_djev_"},
+    response = await axios.get(
+      "https://instagram-scraper-api12.p.rapidapi.com/api/v1/posts/full?username=_djev_",
       options
     ).catch((err) => {
-      console.error("API request failed:", err.message);
-      throw new Error(`API request failed: ${err.message}`);
+      console.error("API request failed:", err.response.message);
+      throw new Error(`API request failed: ${err.response.message}`);
     });
     
-    response.data = JSON.parse(jsonrepair(response.data));
+    console.log(response.data);
+    
+    response.data = JSON.parse(jsonrepair(JSON.stringify(response.data)));
 
     // Validate the response structure
-    if (!response.data?.result?.edges) {
+    if (!response?.data?.data) {
       console.error("Unexpected API response structure:", JSON.stringify(response.data));
       throw new Error("API response missing expected data structure");
     }
 
-    const {data: {result: {edges: items}}} = response;
+    const {data: {data: items}} = response;
 
     const nth = items.length,
     candidates = [],
@@ -222,11 +225,12 @@ export async function flyerUpdate() {
 
     for (;itR8;--itR8) {
       curN = nth - itR8;
-      tymStamp = dayjs.unix(items[curN].node.taken_at).utc().tz("America/Lima");
-      if (server_time.diff(tymStamp,"month") < 3 && items[curN].node.image_versions2.candidates[0].url && items[curN].node.caption.text.length) {
-        captions[captions.length] = encodeURI(items[curN].node.caption.text);
-        candidates[candidates.length] = items[curN].node.image_versions2.candidates[0].url;
-        posts[posts.length] = {uri:`ntra/src/media/flyers/${curN}.jpg`,img:await getImageAsBase64(items[curN].node.image_versions2.candidates[0].url)};
+      tymStamp = dayjs.unix(items[curN].taken_at).utc().tz("America/Lima");
+      if (server_time.diff(tymStamp,"month") < 6 && items[curN].image_versions2.candidates[0].url) {
+        if (items[curN].caption?.text?.length) captions[captions.length] = encodeURI(items[curN].caption.text);
+        else captions[captions.length] = "No caption.";
+        candidates[candidates.length] = items[curN].image_versions2.candidates[0].url;
+        posts[posts.length] = {uri:`ntra/src/media/flyers/${curN}.jpg`,img:await getImageAsBase64(items[curN].image_versions2.candidates[0].url)};
       }
     }
     

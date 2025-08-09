@@ -1,11 +1,16 @@
+// Network
 import axios from "axios";
-import {sendHTMLResponse,checkValues,report,tabulateList} from "../../../lib/ntry.js";
+
+// Utility
+import {envLookup, sendHTMLResponse,checkValues,report,tabulateList,buildEmailHtml} from "../../../lib/ntry.js";
 
 export async function sendMail (body) {
-  const log = [];
+  const log = [],
+  params = new URLSearchParams();
   let susValue = 9,
   statusCode = 200,
   state = 2,
+  isVerified = false,
   datum;
   if (body?.fields?.length) {
     datum = body?.fields;
@@ -13,11 +18,34 @@ export async function sendMail (body) {
   }
   else report("Fields was empty!",log,false);
   try {
-    if (checkValues(log,[1],false)) new Error(log[0]);
+    params.append("secret", envLookup("HCAPTCHA_SECRET"));
+    params.append("response", datum?.token);
+      
+    await axios.post("https://api.hcaptcha.com/siteverify", params).then((resp) => {
+      if (resp?.data?.success && resp?.status === 200) {
+        isVerified = true;
+        report("Verified as not a robot!",log);
+      }
+      else throw new Error("Captcha not completed!");
+    }).catch((err) => {
+      report(err,log,false);
+    });
+    
+    const emailPayload =
+    {
+      from: 'ALD <info@arborlifedesigns.com>',
+      to: ["evanducote@gmail.com","arborlifedesigns@gmail.com","ducote.help@gmail.com"],
+      headers: {
+        "X-Entity-Ref-ID": Math.floor(Date.now() / 1000).toString()
+      },
+      subject: `New Submission from ${datum?.name?.[0] || "Unknown"}`,
+      html: buildEmailHtml(datum)
+    };
+    if (checkValues(log,false)) new Error(log[0]);
     const hf = axios.create({
       baseURL: "https://router.huggingface.co/v1",
       headers: {
-       "Authorization": `Bearer ${process?.env?.HF_TOKEN}`,
+       "Authorization": `Bearer ${envLookup("HF_TOKEN")}`,
        "Content-Type": "application/json",
       }
     });
@@ -56,7 +84,21 @@ export async function sendMail (body) {
     }).catch((err) => {
       report(JSON.stringify(err?.response?.data?.error?.message) || err,log,false);
     });
-    if (checkValues(log,[1,3,5,7,9,11,13,15],false)) {
+    if (susValue > 3 && isVerified) {
+      await axios.post("https://api.resend.com/emails", emailPayload,
+      {
+        headers: {
+          "Authorization": `Bearer ${envLookup("RESEND_API_KEY")}`,
+          "Content-Type": "application/json"
+        }
+      }).then((resp) => {
+        if (resp?.status === 200) report(`Sent email with the ID of ${resp?.data?.id}`,log);
+        else throw new Error(`Returned with a status code of ${resp?.status}`);
+      }).catch((err) => {
+        report(JSON.stringify(err?.response?.data?.error?.message) || err,log,false);
+      });
+    }
+    if (checkValues(log,false)) {  
       statusCode = 400;
       state = 0;
       throw Error(tabulateList(log));

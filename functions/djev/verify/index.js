@@ -7,7 +7,7 @@ exports.handler = async function (event) {
     
     let captchaVerify;
       
-    params.append("secret", Deno.env.get("HCAPTCHA_SECRET"));
+    params.append("secret", Deno?.env?.get("HCAPTCHA_SECRET") || process?.env?.HCAPTCHA_SECRET);
     params.append("response", token);
       
     await axios.post("https://api.hcaptcha.com/siteverify", params).then((resp) => {

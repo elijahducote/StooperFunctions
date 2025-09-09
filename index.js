@@ -16,7 +16,7 @@ import {
 } from "./functions/ald/ntry.js";
 const app = new Hono();
 
-Deno.cron("Run every week", { hour: {every: 168 } }, flyerUpdate);
+Deno.cron("Run every Wednesday", "0 0 * * WED", flyerUpdate);
 
 app.post("/send-mail", wrapper(sendMail,"HONO")).get(wrapper(sendMail,"HONO"));
 app.post("/create-intent", wrapper(createIntent,"HONO"));

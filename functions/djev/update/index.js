@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import {envLookup} from "../../../lib/ntry.js"";
+import {envLookup} from "../../../lib/ntry.js";
 
 const axiosInstance = axios.create({
   baseURL:"https://api.github.com/repos/elijahducote/DJEv",

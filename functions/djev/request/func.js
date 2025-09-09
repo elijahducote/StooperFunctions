@@ -32,7 +32,7 @@ export async function request (body) {
     // Send to Resend API
     await axios.post('https://api.resend.com/emails', emailPayload, {
       headers: {
-        "Authorization": `Bearer ${Deno?.env?.get("RESEND_API_KEY") || process?.env?.RESEND_API_KEY}`
+        "Authorization": `Bearer ${envLookup("RESEND_API_KEY")`
       }
     });
 

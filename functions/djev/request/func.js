@@ -16,6 +16,7 @@ export async function request (body) {
       statum = resp.data.success;
       console.log(resp.data);
     }).catch((err) => {
+      console.log(err);
       error = err;
     });
     if (!statum && error) throw new Error(error);

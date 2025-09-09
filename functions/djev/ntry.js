@@ -7,7 +7,7 @@ import {request} from "./request/func.js";
 import {resend} from "./resend/func.js";
 import {subscribe} from "./subscribe/func.js";
 import {contract} from "./contract/func.js";
-import {updater} from "./update/func.js";
+//import {updater} from "./update/func.js";
 
 export {
   createIntent,
@@ -18,6 +18,6 @@ export {
   request,
   resend,
   subscribe,
-  contract,
-  updater
+  contract
+ // updater
 };

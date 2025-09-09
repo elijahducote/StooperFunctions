@@ -14,10 +14,11 @@ export async function request (body) {
     
     await axios.post("https://api.hcaptcha.com/siteverify", params).then((resp) => {
       statum = resp.data.success;
+      console.log(resp.data);
     }).catch((err) => {
       error = err;
     });
-    if (!statum || error) throw new Error(error);
+    if (!statum && error) throw new Error(error);
     // Prepare email payload
     const emailPayload = {
       from: "DJ Ev <booking@djev.org>",

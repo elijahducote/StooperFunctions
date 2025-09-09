@@ -10,8 +10,10 @@ export async function request (body) {
     
     const params = new URLSearchParams();
     params.append("secret", envLookup("HCAPTCHA_SECRET"));
-    params.append("response", fields.requesttoken);
-
+    params.append("response", fields.requesttoken)
+    
+    console.log(fields.requesttoken);
+    
     await axios.post("https://api.hcaptcha.com/siteverify", params).then((resp) => {
       statum = resp.data.success;
     }).catch((err) => {

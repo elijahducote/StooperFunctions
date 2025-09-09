@@ -17,7 +17,7 @@ export async function request (body) {
     }).catch((err) => {
       error = err;
     });
-    if (!statum) throw new Error(error);
+    if (!statum || error) throw new Error(error);
     // Prepare email payload
     const emailPayload = {
       from: "DJ Ev <booking@djev.org>",

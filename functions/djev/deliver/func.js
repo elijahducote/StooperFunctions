@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import {envLookup} from "../../../lib/ntry.js"";
+import {envLookup} from "../../../lib/ntry.js";
 
 export async function deliver (body) {
     const queryStringParameters = new URLSearchParams(body),

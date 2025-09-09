@@ -32,7 +32,7 @@ export async function important () {
       if (fileStatus === 200) report(`Got the important.json file: "${fileResponse.sha}"`,log);
       else report(`Something not right: "${fileResponse}"`,log,false);
       
-      if (checkValues(log) {
+      if (checkValues(log)) {
         const {sha: latestCommit} = vow[0].value.data,
         {content: fileContent, sha: blobHash} = vow[1].value.data,
         jsonObject = JSON.parse(atob(fileContent));

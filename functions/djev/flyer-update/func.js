@@ -208,12 +208,12 @@ export async function flyerUpdate() {
     response.data = JSON.parse(jsonrepair(JSON.stringify(response.data)));
 
     // Validate the response structure
-    if (!response?.data?.data) {
+    if (!response?.data?.result) {
       console.error("Unexpected API response structure:", JSON.stringify(response.data));
       throw new Error("API response missing expected data structure");
     }
 
-    const {data: {data: items}} = response;
+    const {data: {result: {edges: items]}} = response;
 
     const nth = items.length,
     candidates = [],
@@ -227,11 +227,11 @@ export async function flyerUpdate() {
     for (;itR8;--itR8) {
       curN = nth - itR8;
       tymStamp = dayjs.unix(items[curN].taken_at).utc().tz("America/Lima");
-      if (server_time.diff(tymStamp,"month") < 6 && items[curN].image_versions2.candidates[0].url) {
-        if (items[curN].caption?.text?.length) captions[captions.length] = encodeURI(items[curN].caption.text);
+      if (server_time.diff(tymStamp,"month") < 6 && items[curN].node?.image_versions2.candidates[0].url) {
+        if (items[curN].node?.caption?.text?.length) captions[captions.length] = encodeURI(items[curN].node?.caption.text);
         else captions[captions.length] = "No caption.";
-        candidates[candidates.length] = items[curN].image_versions2.candidates[0].url;
-        posts[posts.length] = {uri:`ntra/src/media/flyers/${curN}.jpg`,img:await getImageAsBase64(items[curN].image_versions2.candidates[0].url)};
+        candidates[candidates.length] = items[curN].node?.image_versions2.candidates[0].url;
+        posts[posts.length] = {uri:`ntra/src/media/flyers/${curN}.jpg`,img:await getImageAsBase64(items[curN].node?.image_versions2.candidates[0].url)};
       }
     }
     
@@ -255,6 +255,7 @@ export async function flyerUpdate() {
   }
 
 }
+
 
 
 

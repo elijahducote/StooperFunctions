@@ -198,8 +198,8 @@ export async function flyerUpdate() {
       "https://instagram120.p.rapidapi.com/api/instagram/posts",
       options
     ).catch((err) => {
-      console.error("API request failed:", err.response);
-      throw new Error(`API request failed: ${err.response}`);
+      console.error("API request failed:", err.response.data);
+      throw new Error(`API request failed: ${err.response.data}`);
     });
     
     console.log(response.data);
@@ -254,4 +254,5 @@ export async function flyerUpdate() {
   }
 
 }
+
 

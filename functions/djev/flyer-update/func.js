@@ -198,8 +198,8 @@ export async function flyerUpdate() {
       "https://instagram-scraper-api12.p.rapidapi.com/api/v1/posts/full?username=_djev_",
       options
     ).catch((err) => {
-      console.error("API request failed:", err.response.message);
-      throw new Error(`API request failed: ${err.response.message}`);
+      console.error("API request failed:", err.response);
+      throw new Error(`API request failed: ${err.response}`);
     });
     
     console.log(response.data);
@@ -252,4 +252,5 @@ export async function flyerUpdate() {
       type: "text/plain"
     }
   }
+
 }

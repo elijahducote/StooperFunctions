@@ -184,6 +184,7 @@ export async function flyerUpdate() {
   try {
     const server_time = dayjs().utc().tz("America/Lima"),
     options = {
+      method: "POST",
       data: {
         username: "_djev_"
       },
@@ -194,7 +195,7 @@ export async function flyerUpdate() {
       },
       responseEncoding: "utf8"
     },
-    response = await axios.post(
+    response = await axios.request(
       "https://instagram120.p.rapidapi.com/api/instagram/posts",
       options
     ).catch((err) => {
@@ -254,5 +255,6 @@ export async function flyerUpdate() {
   }
 
 }
+
 
 

@@ -213,7 +213,7 @@ export async function flyerUpdate() {
       throw new Error("API response missing expected data structure");
     }
 
-    const {data: {result: {edges: items]}} = response;
+    const {data: {result: {edges: items}}} = response;
 
     const nth = items.length,
     candidates = [],
@@ -255,6 +255,7 @@ export async function flyerUpdate() {
   }
 
 }
+
 
 
 

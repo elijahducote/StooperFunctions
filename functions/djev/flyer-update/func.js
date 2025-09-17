@@ -184,18 +184,18 @@ export async function flyerUpdate() {
   try {
     const server_time = dayjs().utc().tz("America/Lima"),
     options = {
+      data: {
+        username: "_djev_"
+      },
       headers: {
-        "x-rapidapi-host": "instagram-scraper-api12.p.rapidapi.com",
-        
-        // 9d5c26be38msh6d01dc42e5e9bffp1fcb31jsn8279a6c0b958
-        // 40e82884e3msh4daf8915a723745p1675c7jsn0d210687a2bb
+        "x-rapidapi-host": "instagram120.p.rapidapi.com",
         "x-rapidapi-key": envLookup("RAPIDAPI_KEY"),
         "Content-Type": "application/json"
       },
       responseEncoding: "utf8"
     },
-    response = await axios.get(
-      "https://instagram-scraper-api12.p.rapidapi.com/api/v1/posts/full?username=_djev_",
+    response = await axios.post(
+      "https://instagram120.p.rapidapi.com/api/instagram/posts",
       options
     ).catch((err) => {
       console.error("API request failed:", err.response);
@@ -254,3 +254,4 @@ export async function flyerUpdate() {
   }
 
 }
+

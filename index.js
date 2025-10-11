@@ -14,6 +14,9 @@ import {
 import {
   sendMail
 } from "./functions/ald/ntry.js";
+import {
+  updateReleases
+} from "./functions/evwave/ntry.js";
 const app = new Hono();
 
 Deno.cron("Run every Wednesday", "0 0 * * WED", flyerUpdate);
@@ -28,5 +31,6 @@ app.post("/request", wrapper(request,"HONO"));
 app.post("/resend", wrapper(resend,"HONO"));
 app.post("/subscribe", wrapper(subscribe,"HONO"));
 app.post("/contract", wrapper(contract,"HONO"));
+app.get("/update-releases", wrapper(updateReleases,"HONO"));
 
 Deno.serve(app.fetch);

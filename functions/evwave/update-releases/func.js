@@ -63,7 +63,7 @@ export async function updateReleases(body) {
       cur = leng - i;
       poplus[cur] = {name:stats[cur].name,url:stats[cur].external_urls.spotify,album:stats[cur].album.name,date:stats[cur].album.release_date,cover:stats[cur].album.images[0].url,id:stats[cur].id};
     }
-    await axios.get("https://api.spotify.com/v1/artists/5hTbr7Q7inWI4pYOcOPsH0/albums?include_groups=album,single&limit=50",{headers:{"Authorization": `Bearer ${token}`}})
+    await axios.get("https://api.spotify.com/v1/artists/3DNggTwKmMtPa51K3zl0SV/albums?include_groups=album,single&limit=50",{headers:{"Authorization": `Bearer ${token}`}})
     .then(response => {
       if (response.status === 200) albums = response.data.items;
       else throw new Error("Uh, oh! " + response.status);

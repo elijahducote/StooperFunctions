@@ -14,7 +14,9 @@ sha,
 msgcode,
 fyl,
 token,
-NTH;
+NTH,
+latestAlbum,
+albumTracks;
 
 export async function updateReleases(body) {
   try {
@@ -53,21 +55,43 @@ export async function updateReleases(body) {
   }
   
   try {
-    await axios.get("https://api.spotify.com/v1/artists/3DNggTwKmMtPa51K3zl0SV/top-tracks?country=US",{headers:{"Authorization": `Bearer ${token}`}})
-    .then(response => {
-      if (response.status === 200) stats = response.data.tracks;
-      else throw new Error("Uh, oh! " + response.status);
-    });
-    leng = stats.length;
-    for (i = leng;i;--i) {
-      cur = leng - i;
-      poplus[cur] = {name:stats[cur].name,url:stats[cur].external_urls.spotify,album:stats[cur].album.name,date:stats[cur].album.release_date,cover:stats[cur].album.images[0].url,id:stats[cur].id};
-    }
+    // Get all albums first
     await axios.get("https://api.spotify.com/v1/artists/3DNggTwKmMtPa51K3zl0SV/albums?include_groups=album,single&limit=50",{headers:{"Authorization": `Bearer ${token}`}})
     .then(response => {
       if (response.status === 200) albums = response.data.items;
       else throw new Error("Uh, oh! " + response.status);
     });
+
+    // Sort albums by date to find the latest one
+    sorted = albums.sort((a, b) => {
+      const dateA = new Date(a.release_date);
+      const dateB = new Date(b.release_date);
+      return dateB - dateA;
+    });
+
+    // Get the latest album
+    latestAlbum = sorted[0];
+
+    // Fetch tracks from the latest album
+    await axios.get(`https://api.spotify.com/v1/albums/${latestAlbum.id}/tracks`,{headers:{"Authorization": `Bearer ${token}`}})
+    .then(response => {
+      if (response.status === 200) albumTracks = response.data.items;
+      else throw new Error("Uh, oh! " + response.status);
+    });
+
+    // Format the tracks from the latest album (in order)
+    leng = albumTracks.length;
+    for (i = 0; i < leng; i++) {
+      poplus[i] = {
+        name: albumTracks[i].name,
+        url: albumTracks[i].external_urls.spotify,
+        album: latestAlbum.name,
+        date: latestAlbum.release_date,
+        cover: latestAlbum.images[0].url,
+        id: albumTracks[i].id,
+        track_number: albumTracks[i].track_number
+      };
+    }
   }
   catch (error) {
     return {
@@ -78,11 +102,6 @@ export async function updateReleases(body) {
   }
   
   try {
-    sorted = albums.sort((a, b) => {
-      const dateA = new Date(a.release_date);
-      const dateB = new Date(b.release_date);
-      return dateB - dateA;
-    });
     var arrlen = albums.length;
     for (NTH = arrlen;NTH;--NTH) {
       payload.push({name:sorted[arrlen - NTH].name,url:sorted[arrlen - NTH].external_urls.spotify,cover:sorted[arrlen - NTH].images[0].url,date:sorted[arrlen - NTH].release_date,id:sorted[arrlen - NTH].id});

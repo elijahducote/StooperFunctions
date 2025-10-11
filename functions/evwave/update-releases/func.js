@@ -37,7 +37,7 @@ export async function updateReleases(body) {
   }
   
   try {
-    await axios.post("https://accounts.spotify.com/api/token",`grant_type=refresh_token&refresh_token=${envLookup("SPOTIFY_REFRESH_TOKEN")}`,{headers:{"Content-Type":"application/x-www-form-urlencoded","Authorization":"Basic " + (Buffer.from(envLookup("SPOTIFY_CLIENT_ID") + ":" + envLookup("SPOTIFY_CLIENT_SECRET")).toString("base64"))}})
+    await axios.post("https://accounts.spotify.com/api/token",`grant_type=refresh_token&refresh_token=${envLookup("SPOTIFY_REFRESH_TOKEN")}`,{headers:{"Content-Type":"application/x-www-form-urlencoded","Authorization":"Basic " + (btoa(envLookup("SPOTIFY_CLIENT_ID") + ":" + envLookup("SPOTIFY_CLIENT_SECRET")))}})
     .then(response => {
       if (response.status === 200) token = response.data.access_token;
       else throw new Error("Uh, oh! " + response.status);
@@ -48,7 +48,7 @@ export async function updateReleases(body) {
     return {
       code:400,
       type: "text/html",
-      msg:"There was a problem with the POST request: " + error,
+      msg:sendHTMLResponse(0,"There was a problem with the POST request: " + error),
     };
   }
   
@@ -91,7 +91,7 @@ export async function updateReleases(body) {
     json.tracks = poplus;
     fyl = JSON.stringify(json);
     
-    await axios.put("https://api.github.com/repos/elijahducote/Ev/contents/automation.json",{"message":"update file","sha":sha,"content":Buffer.from(fyl).toString("base64")},{headers:{"Accept":"application/vnd.github+json","Authorization":`Bearer ${envLookup("GITHUB_TOKEN")}`,"X-GitHub-Api-Version":"2022-11-28"}}).then(response => {
+    await axios.put("https://api.github.com/repos/elijahducote/Ev/contents/automation.json",{"message":"update file","sha":sha,"content":btoa(fyl)},{headers:{"Accept":"application/vnd.github+json","Authorization":`Bearer ${envLookup("GITHUB_TOKEN")}`,"X-GitHub-Api-Version":"2022-11-28"}}).then(response => {
       if (response.status === 200) {
         msgcode = response.data.commit.sha;
       }

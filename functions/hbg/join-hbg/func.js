@@ -27,7 +27,7 @@ export async function joinHbg (body) {
       errout += `\n${err}`;
     });
 
-    if (!statum) throw Error("Captcha verification failed.");
+    if (!statum) throw Error(`Captcha verification failed. ${errout}`);
 
 
     if (files[files.length - 1].content.length) emailPayload.attachments = files.map(file => ({

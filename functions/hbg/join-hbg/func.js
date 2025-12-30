@@ -15,6 +15,7 @@ export async function joinHbg (body) {
     },
     params = new URLSearchParams();
     
+    print(fields);
     let errout = "",
     statum = false;
 

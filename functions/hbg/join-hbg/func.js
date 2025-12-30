@@ -13,6 +13,12 @@ export async function joinHbg (body) {
       subject: `New Submission from ${fields?.givenName?.[0] || "Unknown"}`,
       html: buildEmailHtml(fields)
     },
+    hcaptcha = axios.create({
+      baseURL: "https://api.hcaptcha.com",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      }
+    }),
     params = new URLSearchParams();
     
     print(fields);
@@ -22,7 +28,7 @@ export async function joinHbg (body) {
     params.append("response", fields["h-captcha-response"]);
     params.append("secret", envLookup("HCAPTCHA_SECRET"));
 
-    await axios.post("https://api.hcaptcha.com/siteverify", params).then((resp) => {
+    await hcaptcha.post("https://api.hcaptcha.com/siteverify", params).then((resp) => {
       print(`Response: ${resp.data}`);
       statum = resp.data.success;
     }).catch((err) => {

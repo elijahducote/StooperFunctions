@@ -3,15 +3,14 @@ import {print,envLookup,sendHTMLResponse} from "../../../lib/ntry.js";
 
 export async function joinHbg (body) {
   try {
-    const { fields, files } = body,
-    emailPayload = {
+    const emailPayload = {
       from: "HBG <info@htxgroup.net>",
       to: ["evanducote@gmail.com","ducote.help@gmail.com"],
       headers: {
         "X-Entity-Ref-ID": Math.floor(Date.now() / 1000).toString()
       },
-      subject: `New Submission from ${fields?.givenName?.[0] || "Unknown"}`,
-      html: buildEmailHtml(fields)
+      subject: `New Submission from ${body?.givenName?.[0] || "Unknown"}`,
+      html: buildEmailHtml(body)
     },
     hcaptcha = axios.create({
       baseURL: "https://api.hcaptcha.com",
@@ -25,7 +24,7 @@ export async function joinHbg (body) {
     let errout = "",
     statum;
 
-    params.append("response", fields["h-captcha-response"]);
+    params.append("response", body["h-captcha-response"]);
     params.append("secret", envLookup("HCAPTCHA_SECRET"));
 
     await hcaptcha.post("/siteverify", params).then((resp) => {
@@ -69,12 +68,12 @@ export async function joinHbg (body) {
 }
 
 // Helper to build HTML email content
-function buildEmailHtml (fields) {
+function buildEmailHtml (body) {
   return `
   <h1>New Form Submission</h1>
-  <p><strong>Name:</strong> ${fields?.givenName?.[0] || "N/A"}</p>
-  <p><strong>Industry:</strong> ${fields?.industry?.[0] || "N/A"}</p>
-  <p><strong>Email:</strong> ${fields?.email?.[0] || "N/A"}</p>
-  <p><strong>Message:</strong> ${fields?.message?.[0] || "N/A"}</p
+  <p><strong>Name:</strong> ${body?.givenName?.[0] || "N/A"}</p>
+  <p><strong>Industry:</strong> ${body?.industry?.[0] || "N/A"}</p>
+  <p><strong>Email:</strong> ${body?.email?.[0] || "N/A"}</p>
+  <p><strong>Message:</strong> ${body?.message?.[0] || "N/A"}</p
   `;
 }

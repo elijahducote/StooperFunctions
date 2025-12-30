@@ -24,7 +24,7 @@ export async function joinHbg (body) {
     let errout = "",
     statum;
 
-    params.append("response", fields.["h-captcha-response"]);
+    params.append("response", fields["h-captcha-response"]);
     params.append("secret", envLookup("HCAPTCHA_SECRET"));
 
     await hcaptcha.post("/siteverify", params).then((resp) => {

@@ -1,5 +1,5 @@
 import axios from "axios";
-import {envLookup,sendHTMLResponse} from "../../../lib/ntry.js";
+import {print,envLookup,sendHTMLResponse} from "../../../lib/ntry.js";
 
 export async function joinHbg (body) {
   try {
@@ -22,10 +22,10 @@ export async function joinHbg (body) {
     params.append("secret", envLookup("HCAPTCHA_SECRET"));
 
     await axios.post("https://api.hcaptcha.com/siteverify", params).then((resp) => {
-      console.log(`Response: ${resp.data}`);
+      print(`Response: ${resp.data}`);
       statum = resp.data.success;
     }).catch((err) => {
-      console.log(`Error: ${resp.data}`);
+      print(`Error: ${resp.data}`);
       errout += `\n${err}`;
     });
 

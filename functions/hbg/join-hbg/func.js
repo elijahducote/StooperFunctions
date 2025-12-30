@@ -66,6 +66,5 @@ function buildEmailHtml (body) {
   <p><strong>Name:</strong> ${body?.givenName || "N/A"}</p>
   <p><strong>Industry:</strong> ${body?.industry || "N/A"}</p>
   <p><strong>Email:</strong> ${body?.email || "N/A"}</p>
-  <p><strong>Message:</strong> ${body?.message || "N/A"}</p
-  `;
+  <p><strong>Message:</strong> ${body?.message || "N/A"}</p>`;
 }

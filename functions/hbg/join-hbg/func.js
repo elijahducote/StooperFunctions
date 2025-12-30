@@ -20,7 +20,6 @@ export async function joinHbg (body) {
     }),
     params = new URLSearchParams();
     
-    print(body);
     let errout = "",
     statum;
 
@@ -36,13 +35,6 @@ export async function joinHbg (body) {
     });
 
     if (!statum) throw Error(`Captcha verification failed. ${errout}`);
-
-
-    if (files[files.length - 1].content.length) emailPayload.attachments = files.map(file => ({
-        content: file.content.toString("base64"),
-        filename: file.filename,
-        contentType: file.contentType
-    }));
 
     // Send to Resend API
     await axios.post('https://api.resend.com/emails', emailPayload, {

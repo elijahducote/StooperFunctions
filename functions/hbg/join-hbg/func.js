@@ -21,17 +21,19 @@ export async function joinHbg (body) {
     }),
     params = new URLSearchParams();
     
-    print(fields);
     let errout = "",
-    statum = false;
+    statum,
+    responder;
 
     params.append("response", fields?.["h-captcha-response"]?.[0]);
     params.append("secret", envLookup("HCAPTCHA_SECRET"));
 
     await hcaptcha.post("/siteverify", params).then((resp) => {
       print(`Response: ${resp.data}`);
+      responder = resp.data;
       statum = resp.data.success;
     }).catch((err) => {
+      responder = resp.data;
       print(`Error: ${resp.data}`);
       errout += `\n${err}`;
     });
@@ -61,7 +63,7 @@ export async function joinHbg (body) {
     
   } catch (error) {
     return {
-      msg: sendHTMLResponse(0, error),
+      msg: sendHTMLResponse(0, `${error}\n${responder}`),
       code: 500,
       type: "text/html"
     };

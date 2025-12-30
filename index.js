@@ -17,10 +17,14 @@ import {
 import {
   updateReleases
 } from "./functions/evwave/ntry.js";
+import {
+  joinHbg
+} from "./functions/hbg/ntry.js";
 const app = new Hono();
 
 Deno.cron("Run every Wednesday", "0 0 * * WED", flyerUpdate);
 
+app.post("/join-hbg", wrapper(sendMail,"HONO")).get(wrapper(sendMail,"HONO"));
 app.post("/send-mail", wrapper(sendMail,"HONO")).get(wrapper(sendMail,"HONO"));
 app.post("/create-intent", wrapper(createIntent,"HONO"));
 app.post("/deliver", wrapper(deliver,"HONO"));

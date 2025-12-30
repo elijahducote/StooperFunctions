@@ -22,9 +22,10 @@ export async function joinHbg (body) {
     params.append("secret", envLookup("HCAPTCHA_SECRET"));
 
     await axios.post("https://api.hcaptcha.com/siteverify", params).then((resp) => {
-      console.log(`Response code 200: ${resp.data}`);
+      console.log(`Response: ${resp.data}`);
       statum = resp.data.success;
     }).catch((err) => {
+      console.log(`Error: ${resp.data}`);
       errout += `\n${err}`;
     });
 

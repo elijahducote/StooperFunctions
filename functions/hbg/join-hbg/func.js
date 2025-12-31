@@ -9,7 +9,7 @@ export async function joinHbg (body) {
       headers: {
         "X-Entity-Ref-ID": Math.floor(Date.now() / 1000).toString()
       },
-      subject: `New Submission from ${body?.givenName?.[0] || "Unknown"}`,
+      subject: `New Submission from ${body?.givenName || "Unknown"}`,
       html: buildEmailHtml(body)
     },
     hcaptcha = axios.create({

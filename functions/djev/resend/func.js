@@ -67,6 +67,7 @@ function buildEmailHtml (fields) {
   <p><strong>Location:</strong> ${fields?.locale?.[0] || "N/A"}</p>
   <p><strong>Hours:</strong> ${fields?.workhrs?.[0] || "N/A"}</p>
   <p><strong>Email:</strong> ${fields?.email?.[0] || "N/A"}</p>
+  <p><strong>Phone:</strong> ${fields?.telephone?.[0] || "N/A"}</p>
   <p><strong>Event:</strong> ${fields?.event?.[0] || "N/A"}</p>
   <p><strong>Selection:</strong> ${fields?.selection?.join(", ") || "None"}</p>
   <p><strong>Requests:</strong> ${fields?.requests?.[0] || "N/A"}</p>

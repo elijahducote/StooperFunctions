@@ -55,7 +55,8 @@ export async function joinHbg (body) {
           email: body?.email,
           fields:
           {
-            name: body?.givenName
+            name: body?.givenName,
+            phone: body?.phone
           }
         })
         .then((resp) => {
@@ -100,6 +101,7 @@ function buildEmailHtml (body) {
   return `
   <h1>New Form Submission</h1>
   <p><strong>Name:</strong> ${body?.givenName || "N/A"}</p>
+  <p><strong>Phone:</strong> ${body?.phone || "N/A"}</p>
   <p><strong>Industry:</strong> ${body?.industry || "N/A"}</p>
   <p><strong>Email:</strong> ${body?.email || "N/A"}</p>
   <p><strong>Message:</strong> ${body?.message || "N/A"}</p>`;

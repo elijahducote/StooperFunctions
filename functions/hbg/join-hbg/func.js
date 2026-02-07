@@ -21,6 +21,7 @@ export async function joinHbg (body) {
     params = new URLSearchParams();
     
     let errout = "",
+    succout = "",
     statum;
 
     params.append("response", body["h-captcha-response"]);
@@ -29,12 +30,47 @@ export async function joinHbg (body) {
     await hcaptcha.post("/siteverify", params).then((resp) => {
       print(`Response: ${resp.data}`);
       statum = resp.data.success;
+      if (statum) succout += "\nCaptcha verified.";
+      else throw Error("Captcha failed.");
     }).catch((err) => {
       print(`Error: ${resp.data}`);
       errout += `\n${err}`;
     });
 
-    if (!statum) throw Error(`Captcha verification failed. ${errout}`);
+    if (!statum) throw Error(`Verification failed. ${errout}`);
+
+    if (body?.enroll === "true") {
+      try {
+        const mailerlite = axios.create({
+          baseURL: "https://connect.mailerlite.com/api",
+          headers: {
+            "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": `Bearer ${envLookup("MAILERLITE_HBG")}`
+          }
+        });
+        
+        await mailerlite.post("/subscribers",
+        {
+          email: body?.email,
+          fields:
+          {
+            name: body?.givenName
+          }
+        })
+        .then((resp) => {
+          if (resp.status === 201 || resp.status === 200) succout += `\nAdded user to mailing list.`;
+          else throw new Error("Could not add user to mailing list. Try again!");
+        })
+        .catch((err) => {
+          print(`Error: ${resp.data}`);
+          errout += `\n${err}`;
+        });
+      }
+      catch (err) {
+        errout += `\n${err}`;
+      }
+    }
 
     // Send to Resend API
     await axios.post('https://api.resend.com/emails', emailPayload, {
@@ -45,14 +81,14 @@ export async function joinHbg (body) {
     });
 
     return {
-      msg: sendHTMLResponse(1),
+      msg: sendHTMLResponse(1, succout),
       code: 200,
       type: "text/html"
     };
     
   } catch (error) {
     return {
-      msg: sendHTMLResponse(0, `${error}`),
+      msg: sendHTMLResponse(0, error),
       code: 500,
       type: "text/html"
     };

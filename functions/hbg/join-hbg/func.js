@@ -103,9 +103,9 @@ export async function joinHbg (body) {
 function buildEmailHtml (body) {
   return `
   <h1>Submission Overview</h1>
-  <p><strong>Your Name:</strong> ${body?.givenName || "N/A"}</p>
-  <p><strong>Your Phone:</strong> ${body?.phone || "N/A"}</p>
-  <p><strong>Your Industry:</strong> ${body?.industry || "N/A"}</p>
-  <p><strong>Your Email:</strong> ${body?.email || "N/A"}</p>
-  <p><strong>Your Message:</strong> ${body?.message || "N/A"}</p>`;
+  <p><strong>Name:</strong> ${body?.givenName || "N/A"}</p>
+  <p><strong>Phone:</strong> ${body?.phone || "N/A"}</p>
+  <p><strong>Industry:</strong> ${body?.industry || "N/A"}</p>
+  <p><strong>Email:</strong> ${body?.email || "N/A"}</p>
+  <p><strong>Message:</strong> ${body?.message || "N/A"}</p>`;
 }

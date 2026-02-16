@@ -30,7 +30,7 @@ export async function joinHbg (body) {
     params.append("secret", envLookup("HCAPTCHA_SECRET"));
 
     await hcaptcha.post("/siteverify", params).then((resp) => {
-      print(`Response: ${resp.data}`);
+      print(`Response: ${JSON.stringify(resp.data)}`);
       statum = resp.data.success;
       if (statum) succout += "\nCaptcha verified.";
       else throw Error("Captcha failed.");

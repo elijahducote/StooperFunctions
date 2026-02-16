@@ -7,7 +7,7 @@ export async function joinHbg (body) {
       from: "HBG <info@htxgroup.net>",
       to: body?.email || "example@example.com",
       replyTo: "info@htxgroup.net",
-      bcc: ["info@htxgroup.net","evbeats.net@gmail.com"],
+      bcc: ["info@htxgroup.net","ducote.help@gmail.com","evbeats.net@gmail.com"],
       headers: {
         "X-Entity-Ref-ID": Math.floor(Date.now() / 1000).toString()
       },

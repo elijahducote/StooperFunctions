@@ -6,11 +6,12 @@ export async function joinHbg (body) {
     const emailPayload = {
       from: "HBG <info@htxgroup.net>",
       to: body?.email || "example@example.com",
+      replyTo: "info@htxgroup.net",
       bcc: ["info@htxgroup.net","evbeats.net@gmail.com"],
       headers: {
         "X-Entity-Ref-ID": Math.floor(Date.now() / 1000).toString()
       },
-      subject: `Your Submission Is Received, ${body?.givenName || "Unknown"}`,
+      subject: `Initial Correspondance || "Unknown"}`,
       html: buildEmailHtml(body)
     },
     hcaptcha = axios.create({
@@ -101,7 +102,7 @@ export async function joinHbg (body) {
 // Helper to build HTML email content
 function buildEmailHtml (body) {
   return `
-  <h1>Thank You, You'll Be Contacted Shortly</h1>
+  <h1>Submission Overview</h1>
   <p><strong>Your Name:</strong> ${body?.givenName || "N/A"}</p>
   <p><strong>Your Phone:</strong> ${body?.phone || "N/A"}</p>
   <p><strong>Your Industry:</strong> ${body?.industry || "N/A"}</p>

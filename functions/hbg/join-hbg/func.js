@@ -11,7 +11,7 @@ export async function joinHbg (body) {
       headers: {
         "X-Entity-Ref-ID": Math.floor(Date.now() / 1000).toString()
       },
-      subject: `Initial Correspondance || "Unknown"}`,
+      subject: `Initial Correspondance`,
       html: buildEmailHtml(body)
     },
     hcaptcha = axios.create({

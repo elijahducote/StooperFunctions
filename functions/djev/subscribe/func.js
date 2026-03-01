@@ -24,7 +24,8 @@ export async function subscribe (body) {
       }
     });
     await mailerlite.post("/subscribers", {
-      email: email?.[0]
+      email: email?.[0],
+      groups: ["152990931088311889"]
     }).then((resp) => {
       status = resp.status;
       report(`Returned with a status of ${resp.status}`,log);

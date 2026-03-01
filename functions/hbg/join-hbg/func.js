@@ -54,6 +54,7 @@ export async function joinHbg (body) {
         await mailerlite.post("/subscribers",
         {
           email: body?.email,
+          groups: ["180724019579848465"],
           fields:
           {
             name: body?.givenName,

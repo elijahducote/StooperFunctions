@@ -1,13 +1,13 @@
 import axios from "axios";
 import {print,envLookup,sendHTMLResponse} from "../../../lib/ntry.js";
 
-export async function joinHbg (body) {
+export async function contact (body) {
   try {
     const emailPayload = {
-      from: "HBG <info@htxgroup.net>",
+      from: "Trifect Show <inquiries@trifect.us>",
       to: body?.email || "example@example.com",
-      replyTo: "info@htxgroup.net",
-      bcc: ["info@htxgroup.net","ducote.help@gmail.com","evbeats.net@gmail.com"],
+      replyTo: "artisansbond@gmail.com",
+      bcc: ["ducote.help@gmail.com"],
       headers: {
         "X-Entity-Ref-ID": Math.floor(Date.now() / 1000).toString()
       },
@@ -40,45 +40,11 @@ export async function joinHbg (body) {
 
     if (!statum) throw Error(`Verification failed. ${errout}`);
 
-    if (body?.enroll === "true") {
-      try {
-        const mailerlite = axios.create({
-          baseURL: "https://connect.mailerlite.com/api",
-          headers: {
-            "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Authorization": `Bearer ${envLookup("MAILERLITE_HBG")}`
-          }
-        });
-        
-        await mailerlite.post("/subscribers",
-        {
-          email: body?.email,
-          groups: ["180724019579848465"],
-          fields:
-          {
-            name: body?.givenName,
-            phone: body?.phone
-          }
-        })
-        .then((resp) => {
-          if (resp.status === 201 || resp.status === 200) succout += `\nAdded user to mailing list.`;
-          else throw new Error("Could not add user to mailing list. Try again!");
-        })
-        .catch((err) => {
-          print(`Error: ${resp.data}`);
-          errout += `\n${err}`;
-        });
-      }
-      catch (err) {
-        errout += `\n${err}`;
-      }
-    }
 
     // Send to Resend API
     await axios.post('https://api.resend.com/emails', emailPayload, {
       headers: {
-        "Authorization": `Bearer ${envLookup("HBG_RESEND")}`,
+        "Authorization": `Bearer ${envLookup("RESEND_TRIFECT")}`,
         "Content-Type": "application/json"
       }
     }).then((resp) => {
@@ -105,8 +71,5 @@ function buildEmailHtml (body) {
   return `
   <h1>Submission Overview</h1>
   <p><strong>Name:</strong> ${body?.givenName || "N/A"}</p>
-  <p><strong>Phone:</strong> ${body?.phone || "N/A"}</p>
-  <p><strong>Industry:</strong> ${body?.industry || "N/A"}</p>
-  <p><strong>Email:</strong> ${body?.email || "N/A"}</p>
   <p><strong>Message:</strong> ${body?.message || "N/A"}</p>`;
 }

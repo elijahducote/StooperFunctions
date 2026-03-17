@@ -20,10 +20,14 @@ import {
 import {
   joinHbg
 } from "./functions/hbg/ntry.js";
+import {
+  contact
+} from "./functions/trifect/ntry.js";
 const app = new Hono();
 
 Deno.cron("Run every Wednesday", "0 0 * * WED", flyerUpdate);
 
+app.post("/contact-trifect", wrapper(contact,"HONO")).get(wrapper(contact,"HONO"));
 app.post("/join-hbg", wrapper(joinHbg,"HONO")).get(wrapper(joinHbg,"HONO"));
 app.post("/send-mail", wrapper(sendMail,"HONO")).get(wrapper(sendMail,"HONO"));
 app.post("/create-intent", wrapper(createIntent,"HONO"));

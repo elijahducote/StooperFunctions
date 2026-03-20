@@ -1,0 +1,3 @@
+Inside my Deno Deploy endpoint that runs @functions/evwave/update-releases/func.js I am receiving the error: "There was a problem with the GET request: AxiosError: Request failed with status code 403"
+Which means either the Github request of getting the content for a JSON file is returning 403 (forbidden).
+Or when fetching the artist albums + tracks of albums it is returning forbidden.

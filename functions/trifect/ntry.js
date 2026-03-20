@@ -1,4 +1,4 @@
-import {contact} from "./contact-trifect/contact.js";
+import {contact} from "./contact-trifect/func.js";
 
 export {
   contact

@@ -4,12 +4,12 @@ import {print,envLookup,sendHTMLResponse} from "../../../lib/ntry.js";
 export async function contactJavy (body) {
   try {
     const emailPayload = {
-      from: "Javy Good Times <info@javygoodtimes. com>",
+      from: "Javy Good Times <info@javygoodtimes.com>",
       to: body?.email || "example@example.com",
-      replyTo: "elijahducote@gmail.com",
+      replyTo: "javygoodtimes@gmail.com",
       bcc: [
-        "elijahducote@gmail.com"
-        //,"javygoodtimes@gmail.com"
+        "elijahducote@gmail.com",
+        "javygoodtimes@gmail.com"
       ],
       headers: {
         "X-Entity-Ref-ID": Math.floor(Date.now() / 1000).toString()
@@ -52,7 +52,13 @@ export async function contactJavy (body) {
       }
     }).then((resp) => {
       print(`Response: ${JSON.stringify(resp.data)}`);
+    }).catch(err => {
+      print(`Response: ${JSON.stringify(err.data)}`);
+      errout += JSON.stringify(err.data);
+      statum = false;
     });
+    
+    if (statum) throw new Error(`Failed. ${errout}`);
 
     return {
       msg: sendHTMLResponse(1, succout),

@@ -80,5 +80,6 @@ function buildEmailHtml (body) {
   return `
   <h1>Submission Overview</h1>
   <p><strong>Name:</strong> ${body?.givenName || "N/A"}</p>
+  <p><strong>Email:</strong> ${body?.email || "N/A"}</p>
   <p><strong>Message:</strong> ${body?.message || "N/A"}</p>`;
 }

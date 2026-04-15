@@ -58,7 +58,7 @@ export async function contactJavy (body) {
       statum = false;
     });
     
-    if (statum) throw new Error(`Failed. ${errout}`);
+    if (!statum) throw new Error(`Failed. ${errout}`);
 
     return {
       msg: sendHTMLResponse(1, succout),

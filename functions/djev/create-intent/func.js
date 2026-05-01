@@ -1,10 +1,9 @@
 import Stripe from "stripe";
 import {envLookup,checkValues,tabulateList,report} from "../../../lib/utility.js";
 
-const stripe = Stripe(envLookup("STRIPE_SK"),{apiVersion:"2025-02-24.acacia"});
-
 export async function createIntent(body) {
   try {
+    const stripe = Stripe(envLookup("STRIPE_SK"),{apiVersion:"2025-02-24.acacia"});
     const log = [],
     {payment_method, amount, confirmation_token, idempotencyKey, idempotencyKey1} = body;
     

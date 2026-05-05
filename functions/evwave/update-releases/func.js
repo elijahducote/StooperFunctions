@@ -42,7 +42,7 @@ export async function updateReleases(body,req) {
     .then(response => {
       if (response.status === 200) {
         json = validJSON(atob(response.data.content));
-        sha = response?.data.?sha;
+        sha = response?.data?.sha;
         report(`Got file content (${sha})`,log);
         if (!json) report(`Not valid JSON! (${sha})`,log,false);
       }

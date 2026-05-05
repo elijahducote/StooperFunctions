@@ -1,132 +1,85 @@
 import axios from "axios";
-import {envLookup,sendHTMLResponse} from "../../../lib/ntry.js";
+import {envLookup,checkValues,report,tabulateList,sendHTMLResponse,validJSON} from "../../../lib/ntry.js";
 
-var payload = [],
-poplus = [],
-stats,
-albums,
-sorted,
-json,
-leng,
-i,
-cur,
-sha,
-msgcode,
-fyl,
-token,
-NTH,
-latestAlbum,
-albumTracks;
-
-export async function updateReleases(body) {
+export async function updateReleases(body,req) {
+  const log = [];
+  let statusCode = 400,
+  state = 2,
+  fyl = {},
+  json,
+  sha;
   try {
-    await axios.get("https://api.github.com/repos/elijahducote/Ev/contents/automation.json",{headers:{"Accept":"application/vnd.github+json","Authorization":`Bearer ${envLookup("GITHUB_TOKEN")}`,"X-GitHub-Api-Version":"2022-11-28"}})
+    if (req?.method !=== "POST" || !req?.body) {
+      report("Payload empty or none sent!",log,false);
+      throw Error(tabulateList(log));
+    }
+    if (!req?.headers?.["x-signature-sha256"]?.length) {
+      report("Unauthorized request.",log,false);
+      throw Error(tabulateList(log));
+    }
+    const signature = hexToUint8Array(req.headers["x-signature-sha256"]),
+    encoder = new TextEncoder(),
+    secret = encoder.encode(envLookup("HMAC_SECRET"));
+    passphrase = encoder.encode("evwave.org"),
+    keyGen = await crypto.subtle.importKey(
+      "raw",
+      secret,
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["verify"]
+    ),
+    validRequest = await crypto.subtle.verify(
+      "HMAC",
+      keyGen,
+      signature,
+      passphrase
+    );
+    if (!validRequest) {
+      report("Forged authorization.",log,false);
+      throw Error(tabulateList(log));
+    }
+    await axios.get("https://api.github.com/repos/elijahducote/Ev/contents/automation.json",{headers:{"Accept":"application/vnd.github+json","Authorization":`Bearer ${envLookup("GITHUB_TOKEN")}`}})
     .then(response => {
       if (response.status === 200) {
-        json = JSON.parse(atob(response.data.content));
-        sha = response.data.sha;
+        json = validJSON(atob(response.data.content));
+        sha = response?.data.?sha;
+        report(`Got file content (${sha})`,log);
+        if (!json) report(`Not valid JSON! (${sha})`,log,false);
       }
-      else throw new Error("Uh, oh! " + response.status);
+      else report(`Returned status code of ${response.status}: ${JSON.stringify(response?.data)}`, log, false);
+    })
+    .catch((error) => {
+      report(`There was a problem with the GET request: ${error}`, log, false);
     });
-  }
-  catch (error) {
-    console.log("Failed fetch",error)
-    return {
-      code:400,
-      type: "text/html",
-      msg: sendHTMLResponse(0, "There was a problem with the GET request: " + error),
-    };
-  }
-  
-  /*try {
-    await axios.post("https://accounts.spotify.com/api/token",`grant_type=refresh_token&refresh_token=${envLookup("SPOTIFY_REFRESH_TOKEN")}`,{headers:{"Content-Type":"application/x-www-form-urlencoded","Authorization":"Basic " + (btoa(envLookup("SPOTIFY_CLIENT_ID") + ":" + envLookup("SPOTIFY_CLIENT_SECRET")))}})
-    .then(response => {
-      if (response.status === 200) token = response.data.access_token;
-      else throw new Error("Uh, oh! " + response.status);
-    });
-  }
-  catch (error) {
-    console.log("Failed POST",error);
-    return {
-      code:400,
-      type: "text/html",
-      msg:sendHTMLResponse(0,"There was a problem with the POST request: " + error),
-    };
-  }*/
-  
-  try {
-    // Get all albums first
-    await axios.get("https://api.spotify.com/v1/artists/3DNggTwKmMtPa51K3zl0SV/albums?include_groups=album,single&limit=50",{headers:{"Authorization": `Bearer ${token}`}})
-    .then(response => {
-      if (response.status === 200) albums = response.data.items;
-      else throw new Error("Uh, oh! " + response.status);
-    });
-
-    // Sort albums by date to find the latest one
-    sorted = albums.sort((a, b) => {
-      const dateA = new Date(a.release_date);
-      const dateB = new Date(b.release_date);
-      return dateB - dateA;
-    });
-
-    // Get the latest album
-    latestAlbum = sorted[0];
-
-    // Fetch tracks from the latest album
-    await axios.get(`https://api.spotify.com/v1/albums/${latestAlbum.id}/tracks`,{headers:{"Authorization": `Bearer ${token}`}})
-    .then(response => {
-      if (response.status === 200) albumTracks = response.data.items;
-      else throw new Error("Uh, oh! " + response.status);
-    });
-
-    // Format the tracks from the latest album (in order)
-    leng = albumTracks.length;
-    for (i = 0; i < leng; i++) {
-      poplus[i] = {
-        name: albumTracks[i].name,
-        url: albumTracks[i].external_urls.spotify,
-        album: latestAlbum.name,
-        date: latestAlbum.release_date,
-        cover: latestAlbum.images[0].url,
-        id: albumTracks[i].id,
-        track_number: albumTracks[i].track_number
-      };
+    if (json.tracks.length === 10) {
+      json.tracks.pop();
+      json.tracks.unshift(body);
     }
-  }
-  catch (error) {
-    return {
-      code:400,
-      type: "text/html",
-      msg: sendHTMLResponse(0,"There was a problem with the GET request: " + error),
-    };
-  }
-  
-  try {
-    var arrlen = albums.length;
-    for (NTH = arrlen;NTH;--NTH) {
-      payload.push({name:sorted[arrlen - NTH].name,url:sorted[arrlen - NTH].external_urls.spotify,cover:sorted[arrlen - NTH].images[0].url,date:sorted[arrlen - NTH].release_date,id:sorted[arrlen - NTH].id});
-    }
-    json.discography = payload;
-    json.tracks = poplus;
-    fyl = JSON.stringify(json);
+    else json.tracks.unshift(body);
+    fyl = btoa(JSON.stringify(json));
+    await axios.put("https://api.github.com/repos/elijahducote/Ev/contents/automation.json",{"message":"update file","sha":sha,"content":fyl},{headers:{"Accept":"application/vnd.github+json","Authorization":`Bearer ${envLookup("GITHUB_TOKEN")}`}}).then(response => {
+      if (response.status === 200) report(`Updated file. (commit ${response.data.commit.sha})`,log);
+      else report(`Returned status of ${response.status}: ${JSON.stringify(response?.data)}`,log,false);
+    })
+    .catch((error) => {
+      report(`There was a problem with the PUT request: ${error}`, log, false);
+    });
     
-    await axios.put("https://api.github.com/repos/elijahducote/Ev/contents/automation.json",{"message":"update file","sha":sha,"content":btoa(fyl)},{headers:{"Accept":"application/vnd.github+json","Authorization":`Bearer ${envLookup("GITHUB_TOKEN")}`,"X-GitHub-Api-Version":"2022-11-28"}}).then(response => {
-      if (response.status === 200) {
-        msgcode = response.data.commit.sha;
-      }
-      else throw new Error("Uh, oh! " + response.status);
-    });
-    return {
-      code:200,
-      type: "text/html",
-      msg: sendHTMLResponse(1, `Success! (#${msgcode})`),
-    };
+    if (checkValues(log,false)) throw Error(tabulateList(log));
+    else {
+      report("Successfully updated.",log);
+      statusCode = 200;
+    }
   }
-  catch (error) {
+  catch (err) {
+    report(`Failed: \n${err}`,log,false);
+    state = 0;
+  }
+  finally {
     return {
-      code:400,
+      msg:sendHTMLResponse(state,log[~~(log.length/2)-1]),
       type: "text/html",
-      msg: sendHTMLResponse(0, "There was a problem with the PUT request: " + error),
-    };
+      code: statusCode
+    }
   }
 }

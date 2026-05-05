@@ -77,7 +77,7 @@ export async function updateReleases(body,req) {
   }
   finally {
     return {
-      msg:sendHTMLResponse(state,log[~~(log.length/2)-1]),
+      msg:sendHTMLResponse(state,tabulateList(log)),
       type: "text/html",
       code: statusCode
     }

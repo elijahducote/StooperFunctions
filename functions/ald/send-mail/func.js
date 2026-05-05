@@ -103,7 +103,10 @@ export async function sendMail (body) {
       state = 0;
       throw Error(tabulateList(log));
     }
-    else report(`Suceeded!`,log);
+    else {
+      report(`Suceeded!`,log);
+      state = 1;
+    }
   }
   catch (err) {
     report(`Failed: \n${err}`,log,false);

@@ -38,7 +38,7 @@ export async function updateReleases(body) {
     };
   }
   
-  try {
+  /*try {
     await axios.post("https://accounts.spotify.com/api/token",`grant_type=refresh_token&refresh_token=${envLookup("SPOTIFY_REFRESH_TOKEN")}`,{headers:{"Content-Type":"application/x-www-form-urlencoded","Authorization":"Basic " + (btoa(envLookup("SPOTIFY_CLIENT_ID") + ":" + envLookup("SPOTIFY_CLIENT_SECRET")))}})
     .then(response => {
       if (response.status === 200) token = response.data.access_token;
@@ -52,7 +52,7 @@ export async function updateReleases(body) {
       type: "text/html",
       msg:sendHTMLResponse(0,"There was a problem with the POST request: " + error),
     };
-  }
+  }*/
   
   try {
     // Get all albums first

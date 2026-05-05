@@ -9,8 +9,8 @@ export async function resend (body) {
     error = "Unable to verify!",
     feedback;
     
-    /*const params = new URLSearchParams();
-    params.append("secret", Deno?.env?.get("HCAPTCHA_SECRET") || process?.env?.HCAPTCHA_SECRET);
+    const params = new URLSearchParams();
+    params.append("secret", envLookup("HCAPTCHA_SECRET"));
     params.append("response", fields.token?.[0]);
 
     await axios.post("https://api.hcaptcha.com/siteverify", params).then((resp) => {
@@ -18,7 +18,7 @@ export async function resend (body) {
     }).catch((err) => {
       error = err;
     });
-    if (!statum) throw new Error(error);*/
+    if (!statum) throw new Error(error);
     // Prepare email payload
     const emailPayload = {
       from: 'DJ Ev <booking@djev.org>',

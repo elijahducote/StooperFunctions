@@ -5,9 +5,9 @@ export async function updateReleases(body,req) {
   const log = [];
   let statusCode = 400,
   state = 2,
+  fyl = {},
   json,
-  sha,
-  fyl;
+  sha;
   try {
     if (req?.method !=== "POST" || !req?.body) {
       report("Payload empty or none sent!",log,false);
@@ -51,13 +51,13 @@ export async function updateReleases(body,req) {
     .catch((error) => {
       report(`There was a problem with the GET request: ${error}`, log, false);
     });
-    if (json..length === 10) {
-      json..pop();
-      json..unshift();
+    if (json.tracks.length === 10) {
+      json.tracks.pop();
+      json.tracks.unshift(body);
     }
-    json..[json..length] = ;
-    
-    await axios.put("https://api.github.com/repos/elijahducote/Ev/contents/automation.json",{"message":"update file","sha":sha,"content":btoa(fyl)},{headers:{"Accept":"application/vnd.github+json","Authorization":`Bearer ${envLookup("GITHUB_TOKEN")}`}}).then(response => {
+    else json.tracks.unshift(body);
+    fyl = btoa(JSON.stringify(json));
+    await axios.put("https://api.github.com/repos/elijahducote/Ev/contents/automation.json",{"message":"update file","sha":sha,"content":fyl},{headers:{"Accept":"application/vnd.github+json","Authorization":`Bearer ${envLookup("GITHUB_TOKEN")}`}}).then(response => {
       if (response.status === 200) report(`Updated file. (commit ${response.data.commit.sha})`,log);
       else report(`Returned status of ${response.status}: ${JSON.stringify(response?.data)}`,log,false);
     })

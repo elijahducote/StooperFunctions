@@ -9,7 +9,7 @@ export async function updateReleases(body,req) {
   json,
   sha;
   try {
-    if (req?.method !=== "POST" || !req?.body) {
+    if (req?.method !== "POST" || !req?.body) {
       report("Payload empty or none sent!",log,false);
       throw Error(tabulateList(log));
     }

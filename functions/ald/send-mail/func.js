@@ -45,6 +45,7 @@ export async function sendMail (body) {
   }
   catch (err) {
     state = 0;
+    statusCode = 400;
     report(`Failed: \n${err}`,log,false);
   }
   finally {

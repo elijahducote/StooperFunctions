@@ -53,7 +53,7 @@ export async function sendMail (body) {
   
     await hf.post("/chat/completions",
     {
-      model: "mistralai/Mistral-7B-Instruct-v0.3:together",
+      model: "NousResearch/Hermes-2-Pro-Mistral-7B:featherless-ai",
       messages: [
         {
           role: "user",

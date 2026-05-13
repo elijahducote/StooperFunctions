@@ -12,7 +12,10 @@ import {
   contract
 } from "./functions/djev/ntry.js";
 import {
-  sendMail
+  sendMail,
+  createIntentAld,
+  responseAld,
+  subscribeAld
 } from "./functions/ald/ntry.js";
 import {
   updateReleases
@@ -32,6 +35,9 @@ app.post("/contact-trifect", wrapper(contact,"HONO")).get(wrapper(contact,"HONO"
 app.post("/contact-javy", wrapper(contactJavy,"HONO")).get(wrapper(contactJavy,"HONO"));
 app.post("/join-hbg", wrapper(joinHbg,"HONO")).get(wrapper(joinHbg,"HONO"));
 app.post("/send-mail", wrapper(sendMail,"HONO")).get(wrapper(sendMail,"HONO"));
+app.post("/create-intent-ald", wrapper(createIntentAld,"HONO"));
+app.get("/response-ald", wrapper(responseAld,"HONO")).post(wrapper(responseAld,"HONO"));
+app.post("/subscribe-ald", wrapper(subscribeAld,"HONO"));
 app.post("/create-intent", wrapper(createIntent,"HONO"));
 app.post("/deliver", wrapper(deliver,"HONO"));
 app.get("/flyer-update", wrapper(flyerUpdate,"HONO"));

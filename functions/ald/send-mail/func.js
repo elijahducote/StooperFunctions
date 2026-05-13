@@ -38,7 +38,14 @@ export async function sendMail (body) {
         "X-Entity-Ref-ID": Math.floor(Date.now() / 1000).toString()
       },
       subject: `New Submission from ${datum?.name?.[0] || "Unknown"}`,
-      html: buildEmailHtml(datum)
+      html: buildEmailHtml(
+        {
+          name: datum?.name,
+          email: datum?.email,
+          location: datum?.location,
+          phone: datum?.phone,
+          message: datum?.mail 
+        })
     };
     await axios.post("https://api.resend.com/emails", emailPayload,
       {

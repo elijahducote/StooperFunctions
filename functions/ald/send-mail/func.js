@@ -44,7 +44,8 @@ export async function sendMail (body) {
       {
         headers: {
           "Authorization": `Bearer ${envLookup("RESEND_API_KEY")}`,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          'User-Agent': "ALD/1.0",
         }
       }).then((resp) => {
         if (resp?.status === 200) report(`Sent email with the ID of ${resp?.data?.id}`,log);

@@ -1,6 +1,3 @@
-// Network
-import axios from "axios";
-
 // Utility
 import {envLookup, sendHTMLResponse,checkValues,report,tabulateList,buildEmailHtml} from "../../../lib/ntry.js";
 

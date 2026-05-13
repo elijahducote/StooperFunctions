@@ -12,8 +12,8 @@ export async function sendMail (body) {
   state = 2,
   isVerified = false,
   datum;
-  if (body?.fields?.length) {
-    datum = body?.fields;
+  if (body?.fields && Object.keys(body.fields).length > 0) {
+    datum = body.fields;
     report("Fields were entered!",log);
   }
   else report("Fields was empty!",log,false);
@@ -28,7 +28,7 @@ export async function sendMail (body) {
       }
       else throw new Error("Captcha not completed!");
     }).catch((err) => {
-      report(err,log,false);
+      report(err?.data?.["error-codes"],log,false);
     });
     
     const emailPayload =
@@ -41,7 +41,7 @@ export async function sendMail (body) {
       subject: `New Submission from ${datum?.name?.[0] || "Unknown"}`,
       html: buildEmailHtml(datum)
     };
-    if (checkValues(log,false)) new Error(log[0]);
+    if (checkValues(log,false)) throw new Error(log[0]);
     const hf = axios.create({
       baseURL: "https://router.huggingface.co/v1",
       headers: {

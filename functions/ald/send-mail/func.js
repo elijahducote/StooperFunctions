@@ -9,6 +9,7 @@ export async function sendMail (body) {
   params = new URLSearchParams();
   let statusCode = 200,
   isVerified = false,
+  state = 2,
   datum;
   if (body?.fields && Object.keys(body.fields).length > 0) {
     datum = body.fields;
@@ -40,8 +41,10 @@ export async function sendMail (body) {
       html: buildEmailHtml(datum)
     };
     if (checkValues(log,false)) throw new Error("Checks failed!");
+    else state = 1;
   }
   catch (err) {
+    state = 0;
     report(`Failed: \n${err}`,log,false);
   }
   finally {

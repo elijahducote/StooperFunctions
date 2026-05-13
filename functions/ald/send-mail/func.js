@@ -16,7 +16,7 @@ export async function sendMail (body) {
   try {
     params.append("secret", envLookup("HCAPTCHA_SECRET"));
     params.append("response", datum?.token);
-      
+    
     await axios.post("https://api.hcaptcha.com/siteverify", params).then((resp) => {
       if (resp?.data?.success && resp?.status === 200) {
         isVerified = true;
@@ -37,19 +37,31 @@ export async function sendMail (body) {
       subject: `New Submission from ${datum?.name?.[0] || "Unknown"}`,
       html: buildEmailHtml(datum)
     };
-    if (checkValues(log,false)) throw new Error("Checks failed!");
-    else state = 1;
-  }
-  catch (err) {
-    state = 0;
-    statusCode = 400;
-    report(`Failed: \n${err}`,log,false);
-  }
-  finally {
-    return {
-      msg:sendHTMLResponse(state,tabulateList(log)),
-      type: "text/html",
-      code: statusCode
+    await axios.post("https://api.resend.com/emails", emailPayload,
+      {
+        headers: {
+          "Authorization": `Bearer ${envLookup("RESEND_API_KEY")}`,
+          "Content-Type": "application/json"
+        }
+      }).then((resp) => {
+        if (resp?.status === 200) report(`Sent email with the ID of ${resp?.data?.id}`,log);
+        else throw new Error(`Returned with a status code of ${resp?.status}`);
+      }).catch((err) => {
+        report(JSON.stringify(err?.response?.data?.error?.message) || err,log,false);
+      });
+      if (checkValues(log,false)) throw new Error("Checks failed!");
+      else state = 1;
+    }
+    catch (err) {
+      state = 0;
+      statusCode = 400;
+      report(`Failed: \n${err}`,log,false);
+    }
+    finally {
+      return {
+        msg:sendHTMLResponse(state,tabulateList(log)),
+        type: "text/html",
+        code: statusCode
+      }
     }
   }
-}

@@ -29,6 +29,7 @@ export async function sendMail (body) {
     }).catch((err) => {
       report(err?.data?.["error-codes"],log,false);
     });
+    if (!isVerified) throw new Error("Could not be verified!");
     
     const emailPayload =
     {
@@ -40,11 +41,11 @@ export async function sendMail (body) {
       subject: `New Submission from ${datum?.name?.[0] || "Unknown"}`,
       html: buildEmailHtml(
         {
-          name: datum?.name,
-          email: datum?.email,
-          location: datum?.location,
-          phone: datum?.phone,
-          message: datum?.mail 
+          name: datum?.name?.[0],
+          email: datum?.email?.[0],
+          location: datum?.location?.[0],
+          phone: datum?.phone?.[0],
+          message: datum?.mail?.[0]
         })
     };
     await axios.post("https://api.resend.com/emails", emailPayload,

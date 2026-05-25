@@ -1,3 +1,4 @@
+import { webhookRequest } from "./lib/utility.js";
 import { Hono } from "npm:hono";
 import { wrapper } from "./lib/wrapr.js";
 import {
@@ -30,6 +31,9 @@ import {
   contactJavy
 } from "./functions/javy/ntry.js";
 const app = new Hono();
+
+// At 12:00 AM, only on Wednesday
+Deno.cron("update-hbg-flyer", "0 0 * * WED", () => webhookRequest("flyer"));
 
 app.post("/contact-trifect", wrapper(contact,"HONO")).get(wrapper(contact,"HONO"));
 app.post("/contact-javy", wrapper(contactJavy,"HONO")).get(wrapper(contactJavy,"HONO"));

@@ -33,7 +33,7 @@ import {
 const app = new Hono();
 
 // At 12:00 AM, only on Wednesday
-Deno.cron("update-hbg-flyer", "0 0 * * WED", () => webhookRequest("flyer"));
+Deno.cron("update-hbg-flyer", "0 0 * * 3", () => webhookRequest("flyer"));
 
 app.post("/contact-trifect", wrapper(contact,"HONO")).get(wrapper(contact,"HONO"));
 app.post("/contact-javy", wrapper(contactJavy,"HONO")).get(wrapper(contactJavy,"HONO"));

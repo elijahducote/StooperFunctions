@@ -6,7 +6,7 @@ export async function deliver (body) {
     const queryStringParameters = new URLSearchParams(body),
     nametag = ["Try again","Success"],
     svg = ["<svg xmlns=\"http://www.w3.org/2000/svg\" xml:space=\"preserve\" viewBox=\"0 0 330 330\"><path fill=\"#FF0000\" d=\"M257 193c-6-6-16-6-21 0l-11 11-11-11a15 15 0 0 0-21 21l11 11-11 11a15 15 0 1 0 21 21l11-11 11 11a15 15 0 0 0 21 0c6-6 6-16 0-21l-11-11 11-11c6-5 6-15 0-21zM250 0H20l40 30 75 56z\"/><path fill=\"#FF0000\" d=\"M270 130V23l-30 22-96 72-9 3-9-3L0 23v172c0 8 7 15 15 15h106a105 105 0 0 0 104 120 105 105 0 0 0 45-200zm-45 170a75 75 0 1 1 0-150 75 75 0 0 1 0 150z\"/></svg>","<svg xmlns=\"http://www.w3.org/2000/svg\" xml:space=\"preserve\" viewBox=\"0 0 330 330\"><path fill=\"#00FF00\" d=\"M255 210h-15v-15a15 15 0 0 0-30 0v15h-15a15 15 0 0 0 0 30h15v15a15 15 0 0 0 30 0v-15h15a15 15 0 0 0 0-30zM250 0H20l40 30 75 56z\"/><path fill=\"#00FF00\" d=\"M270 130V23l-30 22-96 72-9 3-9-3L0 23v172c0 8 7 15 15 15h106a105 105 0 0 0 104 120 105 105 0 0 0 45-200zm-45 170a75 75 0 1 1 0-150 75 75 0 0 1 0 150z\"/></svg>"];
-    
+
     let ndx = 0,
     respcode = 400,
     usrname = "Anonymous",
@@ -16,23 +16,23 @@ export async function deliver (body) {
     msg,
     status,
     statum = true;
-    
+
     try {
         const params = Object.fromEntries(queryStringParameters);
         email = params.mailbox;
         msg = params.message;
         token = params.response;
         usrname = email.split("@",1)[0];
-        
+
         let errout = "Oops. Gone awry!",
         firstchar = usrname.charCodeAt(0);
-        
+
         if (firstchar > 96 && firstchar < 123) {
             usrname = String.fromCharCode(firstchar - 32) + usrname.slice(1);
         }
-        
-        
-        
+
+
+
         const hcaptcha = axios.create({
             baseURL: "https://api.hcaptcha.com",
             headers: {
@@ -42,21 +42,21 @@ export async function deliver (body) {
         resend = axios.create({
             baseURL: "https://api.resend.com",
             headers: {
-                "Authorization": `Bearer ${envLookup("RESEND_API_KEY")}`,
+                "Authorization": `Bearer ${envLookup("RESEND_DJEV")}`,
                 "Content-Type": "application/json"
             }
         });
-        
+
         queryStringParameters.append("secret", envLookup("HCAPTCHA_SECRET"));
-        
+
         await hcaptcha.post("/siteverify", queryStringParameters).then((resp) => {
             statum = resp.data.success;
         }).catch((err) => {
             errout += `\n${err}`;
         });
-        
+
         if (!statum) throw new Error(errout);
-        
+
         await resend.post("/emails", {
             from: "Evwave Music <booking@djev.org>",
             to: ["evbeats.net@gmail.com"],
@@ -70,9 +70,9 @@ export async function deliver (body) {
         }).catch((err) => {
             errout += `\n${err}`;
         });
-        
+
         respcode = status;
-        
+
         if (status === 200) {
             ndx = 1;
             contents = "<div class=wrapper><h2 style=color:#00FF00>Success.</h2></div><br><br><br><div class=wrapper><p>Delivered message.</p></div>";

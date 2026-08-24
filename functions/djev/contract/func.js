@@ -9,7 +9,7 @@ export async function contract (body) {
 
     let statum = false,
     error = false;
-    
+
     /*
     const params = new URLSearchParams();
     params.append("secret", Deno.env.get("HCAPTCHA_SECRET") || process.env.HCAPTCHA_SECRET);
@@ -41,12 +41,12 @@ export async function contract (body) {
     // Send to Resend API
     const resp = await axios.post("https://api.resend.com/emails", emailPayload, {
       headers: {
-        "Authorization": `Bearer ${envLookup("RESEND_API_KEY")}`
+        "Authorization": `Bearer ${envLookup("RESEND_DJEV")}`
       }
     }).catch((err) => {
       error = err;
     });
-    
+
     if (error) throw new Error(JSON.stringify(resp.data));
 
     return {
@@ -54,7 +54,7 @@ export async function contract (body) {
       code: 200,
       type: "text/html"
     };
-    
+
   } catch (error) {
     return {
       //msg: sendHTMLResponse(0, error.message),

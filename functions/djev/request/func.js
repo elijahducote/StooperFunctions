@@ -1,17 +1,17 @@
 import axios from "axios";
 import {envLookup,sendHTMLResponse} from "../../../lib/ntry.js";
- 
+
 export async function request (body) {
   try {
     const { fields, files } = body;
-    
+
     let statum = false,
     error = false;
-    
+
     const params = new URLSearchParams();
     params.append("secret", envLookup("HCAPTCHA_SECRET"));
     params.append("response", fields.requesttoken?.[0])
-    
+
     await axios.post("https://api.hcaptcha.com/siteverify", params).then((resp) => {
       statum = resp.data.success;
       console.log(resp.data);
@@ -34,7 +34,7 @@ export async function request (body) {
     // Send to Resend API
     await axios.post('https://api.resend.com/emails', emailPayload, {
       headers: {
-        "Authorization": `Bearer ${envLookup("RESEND_API_KEY")}`
+        "Authorization": `Bearer ${envLookup("RESEND_DJEV")}`
       }
     });
 
@@ -43,7 +43,7 @@ export async function request (body) {
       code: 200,
       type: "text/html"
     };
-    
+
   } catch (error) {
     return {
       msg: sendHTMLResponse(0, error.message),

@@ -9,7 +9,7 @@ export async function updateReleases(body,req) {
   json,
   sha;
   try {
-    if (req?.method !== "POST" || !req?.body) {
+    /* if (req?.method !== "POST" || !req?.body) {
       report("Payload empty or none sent!",log,false);
       throw Error(tabulateList(log));
     }
@@ -37,7 +37,7 @@ export async function updateReleases(body,req) {
     if (!validRequest) {
       report("Forged authorization.",log,false);
       throw Error(tabulateList(log));
-    }
+    }*/
     await axios.get("https://api.github.com/repos/elijahducote/Ev/contents/automation.json",{headers:{"Accept":"application/vnd.github+json","Authorization":`Bearer ${envLookup("GITHUB_TOKEN")}`}})
     .then(response => {
       if (response.status === 200) {

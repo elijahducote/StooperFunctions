@@ -20,7 +20,9 @@ export async function sendMail (body) {
     params.append("secret", envLookup("HCAPTCHA_SECRET"));
     params.append("response", datum?.["h-captcha-response"]);
 
-    await axios.post("https://api.hcaptcha.com/siteverify", params).then((resp) => {
+    await axios.post("https://api.hcaptcha.com/siteverify", params).then((resp) =>
+    {
+      console.log(resp?.data);
       if (resp?.data?.success) {
         isVerified = true;
         report("Verified as not a robot!",log);

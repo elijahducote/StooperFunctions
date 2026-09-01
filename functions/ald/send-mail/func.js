@@ -18,7 +18,7 @@ export async function sendMail (body) {
   else report("Fields was empty!",log,false);
   try {
     params.append("secret", envLookup("HCAPTCHA_SECRET"));
-    params.append("response", datum?.token);
+    params.append("response", datum?.["h-captcha-response"]);
 
     await axios.post("https://api.hcaptcha.com/siteverify", params).then((resp) => {
       if (resp?.data?.success) {

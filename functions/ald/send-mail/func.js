@@ -19,9 +19,9 @@ export async function sendMail (body) {
   try {
     params.append("secret", envLookup("HCAPTCHA_SECRET"));
     params.append("response", datum?.token);
-    
+
     await axios.post("https://api.hcaptcha.com/siteverify", params).then((resp) => {
-      if (resp?.data?.success && resp?.status === 200) {
+      if (resp?.data?.success) {
         isVerified = true;
         report("Verified as not a robot!",log);
       }
@@ -30,11 +30,11 @@ export async function sendMail (body) {
       report(err?.data?.["error-codes"],log,false);
     });
     if (!isVerified) throw new Error("Could not be verified!");
-    
+
     const emailPayload =
     {
       from: 'ALD <info@arborlifedesigns.com>',
-      to: ["evanducote@gmail.com","arborlifedesigns@gmail.com","ducote.help@gmail.com"],
+      to: ["arborlifedesigns@gmail.com","ducote.help@gmail.com"],
       headers: {
         "X-Entity-Ref-ID": Math.floor(Date.now() / 1000).toString()
       },

@@ -10,9 +10,8 @@ export async function contract (body) {
     let statum = false,
     error = false;
 
-    /*
     const params = new URLSearchParams();
-    params.append("secret", Deno.env.get("HCAPTCHA_SECRET") || process.env.HCAPTCHA_SECRET);
+    params.append("secret", envLookup("HCAPTCHA_SECRET"));
     params.append("response", fields.htoken);
 
     await axios.post("https://api.hcaptcha.com/siteverify", params).then((resp) => {
@@ -20,12 +19,12 @@ export async function contract (body) {
     }).catch((err) => {
       error = err;
     });
-    if (!statum) throw new Error(error);*/
+    if (!statum) throw new Error(error);
 
     // Prepare email payload
     const emailPayload = {
       from: 'DJ Ev <booking@djev.org>',
-      to: ["evanducote@gmail.com","evbeats.net@gmail.com","ducote.help@gmail.com"],
+      to: ["evanducote@gmail.com", fields.email?.[0],"evbeats.net@gmail.com","ducote.help@gmail.com"],
       headers: {
         "X-Entity-Ref-ID": Math.floor(Date.now() / 1000).toString()
       },
@@ -71,6 +70,7 @@ function buildEmailHtml (fields) {
   <h1>New Payment</h1>
   <p><strong>Amount:</strong> ${fields.amount?.[0] || "N/A"}</p>
   <p><strong>Name:</strong> ${fields.givenname?.[0] || "N/A"}</p>
+  <p><strong>Email:</strong> ${fields.email?.[0] || "N/A"}</p>
   <p><strong>Event Type:</strong> ${fields.eventtype?.[0] || "N/A"}</p>
   <p><strong>Event Venue:</strong> ${fields.placeof?.[0] || "N/A"}</p>
   <p><strong>Address:</strong> ${fields.location?.[0] || "N/A"}</p>

@@ -85,8 +85,8 @@ export async function joinHbg (body) {
       print(`Response: ${JSON.stringify(resp.data)}`);
     }).catch((resp) => {
       print(`Error: ${resp}`);
-      if (resp.status === 422)  errout += `\n${JSON.stringify(resp.response.data)}`;
-      else errout += `\n${JSON.stringify(resp.response.data)}`;
+      if (resp.status === 422)  errout += "\nMust be a valid email address.";
+      else errout += `\n${resp.response.data.message}`;
     });
 
     if (errout) throw new Error(errout);

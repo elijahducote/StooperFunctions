@@ -5,7 +5,7 @@ export async function joinHbg (body) {
   try {
     const emailPayload = {
       from: "HBG <info@htxgroup.net>",
-      to: body?.email || "example@example.com",
+      to: body?.email || "evbeats.net@gmail.com",
       replyTo: "info@htxgroup.net",
       bcc: ["info@htxgroup.net","ducote.help@gmail.com","evbeats.net@gmail.com"],
       headers: {

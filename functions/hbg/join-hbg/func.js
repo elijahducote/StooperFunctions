@@ -83,7 +83,13 @@ export async function joinHbg (body) {
       }
     }).then((resp) => {
       print(`Response: ${JSON.stringify(resp.data)}`);
+    }).catch((resp) => {
+      print(`Error: ${resp}`);
+      if (resp.status === 422)  errout += `\n${JSON.stringify(resp.response.data)}`;
+      else errout += `\n${JSON.stringify(resp.response.data)}`;
     });
+
+    if (errout) throw new Error(errout);
 
     return {
       msg: sendHTMLResponse(1, succout),

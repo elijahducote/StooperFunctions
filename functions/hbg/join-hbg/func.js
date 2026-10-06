@@ -34,7 +34,7 @@ export async function joinHbg (body) {
       if (statum) succout += "\nCaptcha verified.";
       else throw Error("Captcha failed.");
     }).catch((err) => {
-      print(`Error: ${resp.data}`);
+      print(`Error: ${err.data}`);
       errout += `\n${err}`;
     });
 
@@ -66,12 +66,12 @@ export async function joinHbg (body) {
           else throw new Error("Could not add user to mailing list. Try again!");
         })
         .catch((err) => {
-          print(`Error: ${resp.data}`);
+          print(`Error: ${err.data}`);
           errout += `\n${err}`;
         });
       }
       catch (err) {
-        errout += `\n${err}`;
+        errout += `\n${err.message}`;
       }
     }
 

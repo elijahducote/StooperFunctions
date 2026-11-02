@@ -21,7 +21,7 @@ export async function joinHbg (body) {
       }
     }),
     params = new URLSearchParams();
-    
+
     let errout = "",
     succout = "",
     statum;
@@ -50,11 +50,11 @@ export async function joinHbg (body) {
           "Authorization": `Bearer ${envLookup("MAILERLITE_HBG")}`
           }
         });
-        
+
         await mailerlite.post("/subscribers",
         {
           email: body?.email,
-          groups: ["180724019579848465"],
+          //groups: ["180724019579848465"],
           fields:
           {
             name: body?.givenName,
@@ -96,7 +96,7 @@ export async function joinHbg (body) {
       code: 200,
       type: "text/html"
     };
-    
+
   } catch (error) {
     return {
       msg: sendHTMLResponse(0, error),

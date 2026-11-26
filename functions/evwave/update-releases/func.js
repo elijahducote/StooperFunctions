@@ -139,14 +139,14 @@ function buildTracks(data,log) {
   guaranteedId = String(first?.id ?? ""),
   now = dayjs(),
   seen = new Map(),
-  order = entry => entry.createdAt ? entry.createdAt.valueOf() : Number.NEGATIVE_INFINITY,
-  sortEntries = entries => entries.sort((a,b) => order(a) === order(b) ? 0 : order(b) - order(a));
+  entries = [];
   if (!firstCreatedAt) {
     const keys = Object.keys(items[0]).join(",") || "none",
     sample = JSON.stringify(items[0])?.slice(0,240) ?? "";
     report(`First SoundCloud item has no usable timestamp (keys: ${keys}; sample: ${sample}).`,log);
   }
   seen.set(guaranteedId,{track:first,createdAt:firstCreatedAt});
+  entries.push(seen.get(guaranteedId));
   let included = 1,
   missing = firstCreatedAt ? 0 : 1;
   for (let i = 1;i < items.length;++i) {
@@ -161,15 +161,11 @@ function buildTracks(data,log) {
     const id = String(track?.id ?? "");
     if (seen.has(id)) continue;
     seen.set(id,{track,createdAt});
+    entries.push(seen.get(id));
     ++included;
   }
-  const tracks = sortEntries([...seen.values()]),
-  capped = tracks.slice(0,MAX_TRACKS);
-  if (!capped.some(({track}) => String(track?.id ?? "") === guaranteedId)) {
-    capped[capped.length - 1] = seen.get(guaranteedId);
-    sortEntries(capped);
-  }
-  const result = capped.map(({track,createdAt}) => mapTrack(track,createdAt));
+  const capped = entries.slice(0,MAX_TRACKS),
+  result = capped.map(({track,createdAt}) => mapTrack(track,createdAt));
   if (missing) report(`${missing} SoundCloud item(s) had no usable timestamp.`,log);
   report(`Selected ${result.length} track(s) from ${included} candidate(s).`,log);
   return result;

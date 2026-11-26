@@ -10,6 +10,11 @@ const SOUNDCLOUD_USER_ID = "968314498",
 MAX_TRACKS = 10,
 OUTPUT_TIME_FORMAT = "ddd, DD MMM YYYY HH:mm:ss [+0000]";
 
+async function fingerprint(value) {
+  const digest = await crypto.subtle.digest("SHA-256",new TextEncoder().encode(String(value ?? "")));
+  return Array.from(new Uint8Array(digest)).map(byte => byte.toString(16).padStart(2,"0")).join("").slice(0,12);
+}
+
 function parseCreatedAt(value) {
   let timestamp;
   if (value instanceof Date) timestamp = value.getTime();
@@ -72,6 +77,7 @@ async function getSoundCloudTracks(log,env) {
   clientSecret = String(envLookup("SOUNDCLOUD_CLIENT_SECRET",env) ?? "").trim(),
   credentialSource = env && env.SOUNDCLOUD_CLIENT_ID !== undefined ? "env binding" : typeof process !== "undefined" && process.env?.SOUNDCLOUD_CLIENT_ID !== undefined ? "process.env" : typeof Deno !== "undefined" ? "Deno.env" : "none";
   report(`SoundCloud credentials: source=${credentialSource}, idLength=${clientId?.length ?? 0}, secretLength=${clientSecret?.length ?? 0}.`,log);
+  report(`SoundCloud credential fingerprints: id=${await fingerprint(clientId)}, secret=${await fingerprint(clientSecret)}.`,log);
   if (!clientId || !clientSecret) {
     report("SoundCloud credentials are missing.",log,false);
     throw Error(tabulateList(log));

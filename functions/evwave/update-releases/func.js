@@ -127,23 +127,28 @@ async function getSoundCloudTracks(log) {
 }
 
 function buildTracks(data,log) {
-  const first = normalizeTrack(data[0]),
-  firstCreatedAt = trackCreatedAt(data[0]),
+  const items = data.filter(item => item && typeof item === "object");
+  if (!items.length) {
+    report("SoundCloud returned no usable track items.",log,false);
+    throw Error(tabulateList(log));
+  }
+  const first = normalizeTrack(items[0]),
+  firstCreatedAt = trackCreatedAt(items[0]),
   guaranteedId = String(first?.id ?? ""),
   now = dayjs(),
   seen = new Map(),
   order = entry => entry.createdAt ? entry.createdAt.valueOf() : Number.NEGATIVE_INFINITY,
   sortEntries = entries => entries.sort((a,b) => order(a) === order(b) ? 0 : order(b) - order(a));
   if (!firstCreatedAt) {
-    const keys = Object.keys(data[0] ?? {}).join(",") || "none",
-    sample = JSON.stringify(data[0] ?? null)?.slice(0,240) ?? "";
+    const keys = Object.keys(items[0]).join(",") || "none",
+    sample = JSON.stringify(items[0])?.slice(0,240) ?? "";
     report(`First SoundCloud item has no usable timestamp (keys: ${keys}; sample: ${sample}).`,log);
   }
   seen.set(guaranteedId,{track:first,createdAt:firstCreatedAt});
   let included = 1,
   missing = firstCreatedAt ? 0 : 1;
-  for (let i = 1;i < data.length;++i) {
-    const item = data[i],
+  for (let i = 1;i < items.length;++i) {
+    const item = items[i],
     track = normalizeTrack(item),
     createdAt = trackCreatedAt(item);
     if (!createdAt) {

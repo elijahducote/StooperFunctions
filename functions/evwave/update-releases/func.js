@@ -115,7 +115,7 @@ async function getSoundCloudTracks(log,env) {
       "Authorization": `OAuth ${accessToken}`
     }
   }),
-  {data} = await sc.get(`/users/${SOUNDCLOUD_USER_ID}/tracks`);
+  {data} = await sc.get(`/users/${SOUNDCLOUD_USER_ID}/tracks`,{params:{limit:10,sort:"desc"}});
   const tracks = Array.isArray(data) ? data : Array.isArray(data?.collection) ? data.collection : Array.isArray(data?.tracks) ? data.tracks : [];
   report(`SoundCloud response shape: type=${typeof data}, array=${Array.isArray(data)}, keys=${Object.keys(data ?? {}).join(",") || "none"}, normalizedLength=${tracks.length}.`,log);
   report(`First raw SoundCloud value: ${JSON.stringify(tracks[0] ?? data)?.slice(0,200) ?? ""}.`,log);

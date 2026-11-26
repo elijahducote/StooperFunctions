@@ -101,25 +101,7 @@ async function getSoundCloudTracks(log,env) {
     report(`SoundCloud token request failed: status=${err?.response?.status ?? "none"}, body=${JSON.stringify(err?.response?.data ?? err?.message)?.slice(0,300)}`,log);
     throw err;
   }
-  const refreshToken = tokenData?.refresh_token;
-  report("Got the SoundCloud refresh token.",log);
-  if (!refreshToken) {
-    report("SoundCloud did not return a refresh token.",log,false);
-    throw Error(tabulateList(log));
-  }
-  const refreshTokenParams = new URLSearchParams({
-    grant_type: "refresh_token",
-    refresh_token: refreshToken,
-    client_id: clientId,
-    client_secret: clientSecret
-  }),
-  {data: {access_token: accessToken}} = await axios.post("https://secure.soundcloud.com/oauth/token",refreshTokenParams.toString(),
-  {
-    headers: {
-      "Accept": "application/json; charset=utf-8",
-      "Content-Type": "application/x-www-form-urlencoded"
-    }
-  });
+  const accessToken = tokenData?.access_token;
   report("Got the SoundCloud access token.",log);
   if (!accessToken) {
     report("SoundCloud did not return an access token.",log,false);

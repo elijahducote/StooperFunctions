@@ -69,7 +69,9 @@ function mapTrack(track,createdAt) {
 
 async function getSoundCloudTracks(log,env) {
   const clientId = envLookup("SOUNDCLOUD_CLIENT_ID",env),
-  clientSecret = envLookup("SOUNDCLOUD_CLIENT_SECRET",env);
+  clientSecret = envLookup("SOUNDCLOUD_CLIENT_SECRET",env),
+  credentialSource = env && env.SOUNDCLOUD_CLIENT_ID !== undefined ? "env binding" : typeof process !== "undefined" && process.env?.SOUNDCLOUD_CLIENT_ID !== undefined ? "process.env" : typeof Deno !== "undefined" ? "Deno.env" : "none";
+  report(`SoundCloud credentials: source=${credentialSource}, idLength=${clientId?.length ?? 0}, secretLength=${clientSecret?.length ?? 0}.`,log);
   if (!clientId || !clientSecret) {
     report("SoundCloud credentials are missing.",log,false);
     throw Error(tabulateList(log));
@@ -77,15 +79,23 @@ async function getSoundCloudTracks(log,env) {
   const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64"),
   tokenParams = new URLSearchParams({
     grant_type: "client_credentials"
-  }),
-  {data: {refresh_token: refreshToken}} = await axios.post("https://secure.soundcloud.com/oauth/token",tokenParams,
-  {
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      "Accept": "application/json; charset=utf-8",
-      "Authorization": `Basic ${auth}`
-    }
   });
+  let tokenData;
+  try {
+    ({data:tokenData} = await axios.post("https://secure.soundcloud.com/oauth/token",tokenParams,
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "application/json; charset=utf-8",
+        "Authorization": `Basic ${auth}`
+      }
+    }));
+  }
+  catch (err) {
+    report(`SoundCloud token request failed: status=${err?.response?.status ?? "none"}, body=${JSON.stringify(err?.response?.data ?? err?.message)?.slice(0,300)}`,log);
+    throw err;
+  }
+  const refreshToken = tokenData?.refresh_token;
   report("Got the SoundCloud refresh token.",log);
   if (!refreshToken) {
     report("SoundCloud did not return a refresh token.",log,false);

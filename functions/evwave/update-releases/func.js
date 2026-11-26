@@ -67,9 +67,9 @@ function mapTrack(track,createdAt) {
   };
 }
 
-async function getSoundCloudTracks(log) {
-  const clientId = envLookup("SOUNDCLOUD_CLIENT_ID"),
-  clientSecret = envLookup("SOUNDCLOUD_CLIENT_SECRET");
+async function getSoundCloudTracks(log,env) {
+  const clientId = envLookup("SOUNDCLOUD_CLIENT_ID",env),
+  clientSecret = envLookup("SOUNDCLOUD_CLIENT_SECRET",env);
   if (!clientId || !clientSecret) {
     report("SoundCloud credentials are missing.",log,false);
     throw Error(tabulateList(log));
@@ -177,7 +177,7 @@ function buildTracks(data,log) {
   return result;
 }
 
-export async function updateReleases() {
+export async function updateReleases(body,req = {}) {
   const log = [];
   let statusCode = 400,
   state = 2,
@@ -214,7 +214,7 @@ export async function updateReleases() {
       report("Forged authorization.",log,false);
       throw Error(tabulateList(log));
     }*/
-    await axios.get("https://api.github.com/repos/elijahducote/Ev/contents/automation.json",{headers:{"Accept":"application/vnd.github+json","Authorization":`Bearer ${envLookup("GITHUB_TOKEN")}`}})
+    await axios.get("https://api.github.com/repos/elijahducote/Ev/contents/automation.json",{headers:{"Accept":"application/vnd.github+json","Authorization":`Bearer ${envLookup("GITHUB_TOKEN",req?.env)}`}})
     .then(response => {
       if (response.status === 200) {
         json = validJSON(atob(response.data.content));
@@ -229,9 +229,9 @@ export async function updateReleases() {
       report(`There was a problem with the GET request: ${error}`, log, false);
     });
     if (!json || !Array.isArray(json.tracks)) throw Error(tabulateList(log));
-    json.tracks = buildTracks(await getSoundCloudTracks(log),log);
+    json.tracks = buildTracks(await getSoundCloudTracks(log,req?.env),log);
     fyl = Buffer.from(JSON.stringify(json),"utf8").toString("base64");
-    await axios.put("https://api.github.com/repos/elijahducote/Ev/contents/automation.json",{"message":"update file","sha":sha,"content":fyl},{headers:{"Accept":"application/vnd.github+json","Authorization":`Bearer ${envLookup("GITHUB_TOKEN")}`}}).then(response => {
+    await axios.put("https://api.github.com/repos/elijahducote/Ev/contents/automation.json",{"message":"update file","sha":sha,"content":fyl},{headers:{"Accept":"application/vnd.github+json","Authorization":`Bearer ${envLookup("GITHUB_TOKEN",req?.env)}`}}).then(response => {
       if (response.status === 200) report(`Updated file. (commit ${response.data.commit.sha})`,log);
       else report(`Returned status of ${response.status}: ${JSON.stringify(response?.data)}`,log,false);
     })

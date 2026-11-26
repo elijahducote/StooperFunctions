@@ -229,7 +229,7 @@ export async function updateReleases() {
       report(`There was a problem with the GET request: ${error}`, log, false);
     });
     if (!json || !Array.isArray(json.tracks)) throw Error(tabulateList(log));
-    json.tracks = buildTracks(getSoundCloudTracks(log),log);
+    json.tracks = buildTracks(await getSoundCloudTracks(log),log);
     fyl = Buffer.from(JSON.stringify(json),"utf8").toString("base64");
     await axios.put("https://api.github.com/repos/elijahducote/Ev/contents/automation.json",{"message":"update file","sha":sha,"content":fyl},{headers:{"Accept":"application/vnd.github+json","Authorization":`Bearer ${envLookup("GITHUB_TOKEN")}`}}).then(response => {
       if (response.status === 200) report(`Updated file. (commit ${response.data.commit.sha})`,log);

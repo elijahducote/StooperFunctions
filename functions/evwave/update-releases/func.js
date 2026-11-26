@@ -68,8 +68,8 @@ function mapTrack(track,createdAt) {
 }
 
 async function getSoundCloudTracks(log,env) {
-  const clientId = envLookup("SOUNDCLOUD_CLIENT_ID",env),
-  clientSecret = envLookup("SOUNDCLOUD_CLIENT_SECRET",env),
+  const clientId = String(envLookup("SOUNDCLOUD_CLIENT_ID",env) ?? "").trim(),
+  clientSecret = String(envLookup("SOUNDCLOUD_CLIENT_SECRET",env) ?? "").trim(),
   credentialSource = env && env.SOUNDCLOUD_CLIENT_ID !== undefined ? "env binding" : typeof process !== "undefined" && process.env?.SOUNDCLOUD_CLIENT_ID !== undefined ? "process.env" : typeof Deno !== "undefined" ? "Deno.env" : "none";
   report(`SoundCloud credentials: source=${credentialSource}, idLength=${clientId?.length ?? 0}, secretLength=${clientSecret?.length ?? 0}.`,log);
   if (!clientId || !clientSecret) {

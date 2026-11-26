@@ -12,14 +12,42 @@ MAX_TRACKS = 10,
 OUTPUT_TIME_FORMAT = "ddd, DD MMM YYYY HH:mm:ss [+0000]";
 
 function parseCreatedAt(value) {
-  if (typeof value !== "string" || !value.length) return null;
-  let normalized = value.trim(),
-  legacy = /^(\d{4})\/(\d{2})\/(\d{2})[ T](\d{2}:\d{2}:\d{2})(?:\s*([+-])(\d{2}):?(\d{2}))?$/.exec(normalized);
-  if (legacy) normalized = `${legacy[1]}-${legacy[2]}-${legacy[3]}T${legacy[4]}${legacy[5] ? `${legacy[5]}${legacy[6]}:${legacy[7]}` : "Z"}`;
-  const timestamp = Date.parse(normalized);
+  let timestamp;
+  if (value instanceof Date) timestamp = value.getTime();
+  else if (typeof value === "number") timestamp = value;
+  else if (typeof value === "string" && value.length) {
+    let normalized = value.trim(),
+    legacy = /^(\d{4})\/(\d{2})\/(\d{2})[ T](\d{2}:\d{2}:\d{2})(?:\s*([+-])(\d{2}):?(\d{2}))?$/.exec(normalized);
+    if (legacy) normalized = `${legacy[1]}-${legacy[2]}-${legacy[3]}T${legacy[4]}${legacy[5] ? `${legacy[5]}${legacy[6]}:${legacy[7]}` : "Z"}`;
+    timestamp = Date.parse(normalized);
+  }
+  else return null;
   if (!Number.isFinite(timestamp)) return null;
   const parsed = dayjs(timestamp).utc();
   return parsed.isValid() ? parsed : null;
+}
+
+function normalizeTrack(track) {
+  return track?.origin ?? track?.track ?? track;
+}
+
+function trackCreatedAt(track) {
+  const candidates = [
+    track?.created_at,
+    track?.createdAt,
+    track?.last_modified,
+    track?.lastModified,
+    track?.release_date,
+    track?.releaseDate,
+    track?.timestamp,
+    track?.origin?.created_at,
+    track?.track?.created_at
+  ];
+  for (const candidate of candidates) {
+    const parsed = parseCreatedAt(candidate);
+    if (parsed) return parsed;
+  }
+  return null;
 }
 
 function cleanURL(value) {
@@ -35,7 +63,7 @@ function mapTrack(track,createdAt) {
     url:cleanURL(track?.permalink_url),
     cover:track?.artwork_url ?? "",
     embed:"",
-    time:createdAt.format(OUTPUT_TIME_FORMAT),
+    time:createdAt ? createdAt.format(OUTPUT_TIME_FORMAT) : "",
     id:track?.id === undefined || track?.id === null ? "" : String(track.id)
   };
 }
@@ -104,33 +132,43 @@ async function getSoundCloudTracks(log) {
 }
 
 function buildTracks(data,log) {
-  const firstCreatedAt = parseCreatedAt(data[0]?.created_at);
+  const first = normalizeTrack(data[0]),
+  firstCreatedAt = trackCreatedAt(data[0]),
+  guaranteedId = String(first?.id ?? ""),
+  now = dayjs(),
+  seen = new Map(),
+  order = entry => entry.createdAt ? entry.createdAt.valueOf() : Number.NEGATIVE_INFINITY,
+  sortEntries = entries => entries.sort((a,b) => order(a) === order(b) ? 0 : order(b) - order(a));
   if (!firstCreatedAt) {
-    report(`The first SoundCloud track has an invalid created_at: ${JSON.stringify(data[0]?.created_at)}`,log,false);
-    throw Error(tabulateList(log));
+    const keys = Object.keys(data[0] ?? {}).join(",") || "none",
+    sample = JSON.stringify(data[0] ?? null)?.slice(0,240) ?? "";
+    report(`First SoundCloud item has no usable timestamp (keys: ${keys}; sample: ${sample}).`,log);
   }
-  const now = dayjs(),
-  seen = new Map();
-  seen.set(String(data[0]?.id ?? ""),{track:data[0],createdAt:firstCreatedAt});
-  let included = 1;
+  seen.set(guaranteedId,{track:first,createdAt:firstCreatedAt});
+  let included = 1,
+  missing = firstCreatedAt ? 0 : 1;
   for (let i = 1;i < data.length;++i) {
-    const track = data[i],
-    createdAt = parseCreatedAt(track?.created_at);
-    if (!createdAt || now.diff(createdAt,"month") >= 6) continue;
+    const item = data[i],
+    track = normalizeTrack(item),
+    createdAt = trackCreatedAt(item);
+    if (!createdAt) {
+      ++missing;
+      continue;
+    }
+    if (now.diff(createdAt,"month") >= 6) continue;
     const id = String(track?.id ?? "");
     if (seen.has(id)) continue;
     seen.set(id,{track,createdAt});
     ++included;
   }
-  const tracks = [...seen.values()],
-  guaranteedId = String(data[0]?.id ?? "");
-  tracks.sort((a,b) => b.createdAt.valueOf() - a.createdAt.valueOf());
-  const capped = tracks.slice(0,MAX_TRACKS);
+  const tracks = sortEntries([...seen.values()]),
+  capped = tracks.slice(0,MAX_TRACKS);
   if (!capped.some(({track}) => String(track?.id ?? "") === guaranteedId)) {
     capped[capped.length - 1] = seen.get(guaranteedId);
-    capped.sort((a,b) => b.createdAt.valueOf() - a.createdAt.valueOf());
+    sortEntries(capped);
   }
   const result = capped.map(({track,createdAt}) => mapTrack(track,createdAt));
+  if (missing) report(`${missing} SoundCloud item(s) had no usable timestamp.`,log);
   report(`Selected ${result.length} track(s) from ${included} candidate(s).`,log);
   return result;
 }

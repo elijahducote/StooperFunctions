@@ -2,21 +2,23 @@ import axios from "axios";
 import { Buffer } from "node:buffer";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js";
-import customParseFormat from "dayjs/plugin/customParseFormat.js";
 import {envLookup,checkValues,report,tabulateList,sendHTMLResponse,validJSON} from "../../../lib/ntry.js";
 
 dayjs.extend(utc);
-dayjs.extend(customParseFormat);
 
 const SOUNDCLOUD_USER_ID = "968314498",
 TRACK_LIMIT = 200,
 MAX_TRACKS = 10,
-CREATED_AT_FORMAT = "YYYY/MM/DD HH:mm:ss ZZ",
 OUTPUT_TIME_FORMAT = "ddd, DD MMM YYYY HH:mm:ss [+0000]";
 
 function parseCreatedAt(value) {
   if (typeof value !== "string" || !value.length) return null;
-  const parsed = dayjs(value,CREATED_AT_FORMAT,true).utc();
+  let normalized = value.trim(),
+  legacy = /^(\d{4})\/(\d{2})\/(\d{2})[ T](\d{2}:\d{2}:\d{2})(?:\s*([+-])(\d{2}):?(\d{2}))?$/.exec(normalized);
+  if (legacy) normalized = `${legacy[1]}-${legacy[2]}-${legacy[3]}T${legacy[4]}${legacy[5] ? `${legacy[5]}${legacy[6]}:${legacy[7]}` : "Z"}`;
+  const timestamp = Date.parse(normalized);
+  if (!Number.isFinite(timestamp)) return null;
+  const parsed = dayjs(timestamp).utc();
   return parsed.isValid() ? parsed : null;
 }
 
@@ -104,7 +106,7 @@ async function getSoundCloudTracks(log) {
 function buildTracks(data,log) {
   const firstCreatedAt = parseCreatedAt(data[0]?.created_at);
   if (!firstCreatedAt) {
-    report("The first SoundCloud track has an invalid created_at.",log,false);
+    report(`The first SoundCloud track has an invalid created_at: ${JSON.stringify(data[0]?.created_at)}`,log,false);
     throw Error(tabulateList(log));
   }
   const now = dayjs(),

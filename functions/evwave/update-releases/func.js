@@ -118,18 +118,20 @@ async function getSoundCloudTracks(log) {
     }
   }),
   {data} = await sc.get(`/users/${SOUNDCLOUD_USER_ID}/tracks`);
-  if (!Array.isArray(data) || !data.length) {
+  const tracks = Array.isArray(data) ? data : Array.isArray(data?.collection) ? data.collection : Array.isArray(data?.tracks) ? data.tracks : [];
+  report(`SoundCloud response shape: type=${typeof data}, array=${Array.isArray(data)}, keys=${Object.keys(data ?? {}).join(",") || "none"}, normalizedLength=${tracks.length}.`,log);
+  report(`First raw SoundCloud value: ${JSON.stringify(tracks[0] ?? data)?.slice(0,200) ?? ""}.`,log);
+  if (!tracks.length) {
     report("SoundCloud returned no tracks.",log,false);
     throw Error(tabulateList(log));
   }
-  report(`Got ${data.length} SoundCloud track(s).`,log);
-  report(`SoundCloud response shape: array=${Array.isArray(data)}, length=${data?.length ?? 0}, firstType=${typeof data?.[0]}, firstKeys=${Object.keys(data?.[0] ?? {}).join(",") || "none"}.`,log);
-  report(`First raw SoundCloud value: ${JSON.stringify(data?.[0] ?? null)?.slice(0,200) ?? ""}.`,log);
-  return data;
+  report(`Got ${tracks.length} SoundCloud track(s).`,log);
+  return tracks;
 }
 
 function buildTracks(data,log) {
-  const items = data.filter(item => item && typeof item === "object");
+  report(`buildTracks input: type=${typeof data}, array=${Array.isArray(data)}, keys=${Object.keys(data ?? {}).join(",") || "none"}.`,log);
+  const items = (Array.isArray(data) ? data : []).filter(item => item && typeof item === "object");
   if (!items.length) {
     report("SoundCloud returned no usable track items.",log,false);
     throw Error(tabulateList(log));

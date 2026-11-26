@@ -123,6 +123,8 @@ async function getSoundCloudTracks(log) {
     throw Error(tabulateList(log));
   }
   report(`Got ${data.length} SoundCloud track(s).`,log);
+  report(`SoundCloud response shape: array=${Array.isArray(data)}, length=${data?.length ?? 0}, firstType=${typeof data?.[0]}, firstKeys=${Object.keys(data?.[0] ?? {}).join(",") || "none"}.`,log);
+  report(`First raw SoundCloud value: ${JSON.stringify(data?.[0] ?? null)?.slice(0,200) ?? ""}.`,log);
   return data;
 }
 

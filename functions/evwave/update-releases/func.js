@@ -7,7 +7,6 @@ import {envLookup,checkValues,report,tabulateList,sendHTMLResponse,validJSON} fr
 dayjs.extend(utc);
 
 const SOUNDCLOUD_USER_ID = "968314498",
-TRACK_LIMIT = 200,
 MAX_TRACKS = 10,
 OUTPUT_TIME_FORMAT = "ddd, DD MMM YYYY HH:mm:ss [+0000]";
 
@@ -118,11 +117,7 @@ async function getSoundCloudTracks(log) {
       "Authorization": `OAuth ${accessToken}`
     }
   }),
-  {data} = await sc.get(`/users/${SOUNDCLOUD_USER_ID}/tracks`,{
-    params: {
-      limit: TRACK_LIMIT
-    }
-  });
+  {data} = await sc.get(`/users/${SOUNDCLOUD_USER_ID}/tracks`);
   if (!Array.isArray(data) || !data.length) {
     report("SoundCloud returned no tracks.",log,false);
     throw Error(tabulateList(log));
